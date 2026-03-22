@@ -1,32 +1,18 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CTAButton from '../components/CTAButton.astro';
+import { SITE, SERVICE_PAGE } from '../config/site';
 
-const services = [
-  {
-    title: 'サービス01',
-    desc: 'サービスの詳細な説明文が入ります。お客様の課題に対して具体的にどのようなアプローチで解決するかを説明します。',
-    features: ['特徴1', '特徴2', '特徴3'],
-  },
-  {
-    title: 'サービス02',
-    desc: 'サービスの詳細な説明文が入ります。お客様の課題に対して具体的にどのようなアプローチで解決するかを説明します。',
-    features: ['特徴1', '特徴2', '特徴3'],
-  },
-  {
-    title: 'サービス03',
-    desc: 'サービスの詳細な説明文が入ります。お客様の課題に対して具体的にどのようなアプローチで解決するかを説明します。',
-    features: ['特徴1', '特徴2', '特徴3'],
-  },
-];
+const { heading, subheading, services } = SERVICE_PAGE;
 ---
 
-<BaseLayout title="サービス | Company Name" description="Company Nameが提供するサービスのご紹介です。">
+<BaseLayout title={`${heading} | ${SITE.name}`} description={`${SITE.name}のサービス一覧です。`}>
+
   <!-- ページヘッダー -->
   <section class="bg-gray-900 text-white py-20 px-4">
     <div class="max-w-4xl mx-auto text-center">
-      <h1 class="text-4xl font-bold mb-4">サービス</h1>
-      <p class="text-gray-400 text-lg">お客様のニーズに合わせたサービスをご提供します。</p>
+      <h1 class="text-4xl font-bold mb-4">{heading}</h1>
+      <p class="text-gray-400 text-lg">{subheading}</p>
     </div>
   </section>
 
@@ -34,15 +20,15 @@ const services = [
   <section class="py-20 px-4 bg-white">
     <div class="max-w-6xl mx-auto space-y-16">
       {services.map((service, i) => (
-        <div class={`grid grid-cols-1 md:grid-cols-2 gap-12 items-center ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
-          <div class="bg-gray-100 rounded-2xl aspect-video"></div>
-          <div>
+        <div class={`grid grid-cols-1 md:grid-cols-2 gap-12 items-center ${i % 2 === 1 ? 'md:[direction:rtl]' : ''}`}>
+          <div class="bg-gray-100 rounded-2xl aspect-video md:[direction:ltr]"></div>
+          <div class="md:[direction:ltr]">
             <h2 class="text-2xl font-bold text-gray-900 mb-4">{service.title}</h2>
-            <p class="text-gray-600 leading-relaxed mb-6">{service.desc}</p>
+            <p class="text-gray-600 leading-relaxed mb-6">{service.description}</p>
             <ul class="space-y-2 mb-8">
               {service.features.map((f) => (
                 <li class="flex items-center gap-2 text-gray-700">
-                  <span class="w-2 h-2 bg-blue-600 rounded-full"></span>
+                  <span class="w-2 h-2 bg-blue-600 rounded-full shrink-0"></span>
                   {f}
                 </li>
               ))}
@@ -62,4 +48,5 @@ const services = [
       <CTAButton label="お問い合わせ" href="/contact" variant="secondary" />
     </div>
   </section>
+
 </BaseLayout>

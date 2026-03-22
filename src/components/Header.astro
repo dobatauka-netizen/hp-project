@@ -1,10 +1,5 @@
 ---
-const navLinks = [
-  { href: '/', label: 'ホーム' },
-  { href: '/service', label: 'サービス' },
-  { href: '/about', label: '会社概要' },
-  { href: '/contact', label: 'お問い合わせ' },
-];
+import { SITE, NAV_LINKS } from '../config/site';
 
 const currentPath = Astro.url.pathname;
 ---
@@ -12,27 +7,87 @@ const currentPath = Astro.url.pathname;
 <header class="bg-white shadow-sm sticky top-0 z-50">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
-      <a href="/" class="text-xl font-bold text-gray-900">
-        Company Name
+
+      <!-- ロゴ -->
+      <a href="/" class="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
+        {SITE.name}
       </a>
+
+      <!-- PC ナビ -->
       <nav class="hidden md:flex items-center gap-8">
-        {navLinks.map((link) => (
+        {NAV_LINKS.map((link) => (
           <a
             href={link.href}
             class={`text-sm font-medium transition-colors hover:text-blue-600 ${
-              currentPath === link.href ? 'text-blue-600' : 'text-gray-600'
+              currentPath === link.href ? 'text-blue-600 border-b-2 border-blue-600 pb-0.5' : 'text-gray-600'
             }`}
           >
             {link.label}
           </a>
         ))}
       </nav>
+
+      <div class="flex items-center gap-3">
+        <!-- PC CTA -->
+        <a
+          href="/contact"
+          class="hidden md:inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          無料相談
+        </a>
+
+        <!-- モバイル ハンバーガーボタン -->
+        <button
+          id="menu-btn"
+          class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+          aria-label="メニューを開く"
+          aria-expanded="false"
+        >
+          <svg id="icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <svg id="icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- モバイルメニュー -->
+  <div id="mobile-menu" class="hidden md:hidden border-t border-gray-100">
+    <nav class="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-1">
+      {NAV_LINKS.map((link) => (
+        <a
+          href={link.href}
+          class={`px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50 ${
+            currentPath === link.href ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
+          }`}
+        >
+          {link.label}
+        </a>
+      ))}
       <a
         href="/contact"
-        class="hidden md:inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+        class="mt-2 px-4 py-3 bg-blue-600 text-white text-sm font-medium rounded-lg text-center hover:bg-blue-700 transition-colors"
       >
         無料相談
       </a>
-    </div>
+    </nav>
   </div>
 </header>
+
+<script>
+  const btn = document.getElementById('menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  const iconOpen = document.getElementById('icon-open');
+  const iconClose = document.getElementById('icon-close');
+
+  btn?.addEventListener('click', () => {
+    const isOpen = !menu?.classList.contains('hidden');
+    menu?.classList.toggle('hidden');
+    iconOpen?.classList.toggle('hidden', !isOpen);
+    iconClose?.classList.toggle('hidden', isOpen);
+    btn.setAttribute('aria-expanded', String(!isOpen));
+  });
+</script>

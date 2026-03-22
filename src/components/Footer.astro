@@ -1,4 +1,6 @@
 ---
+import { SITE, NAV_LINKS } from '../config/site';
+
 const year = new Date().getFullYear();
 ---
 
@@ -6,31 +8,31 @@ const year = new Date().getFullYear();
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       <div>
-        <h3 class="text-white font-bold text-lg mb-4">Company Name</h3>
-        <p class="text-sm leading-relaxed">
-          お客様のビジネス成長を<br />全力でサポートします。
-        </p>
+        <h3 class="text-white font-bold text-lg mb-4">{SITE.name}</h3>
+        <p class="text-sm leading-relaxed">{SITE.tagline}</p>
       </div>
       <div>
         <h4 class="text-white font-semibold mb-4">メニュー</h4>
         <ul class="space-y-2 text-sm">
-          <li><a href="/" class="hover:text-white transition-colors">ホーム</a></li>
-          <li><a href="/service" class="hover:text-white transition-colors">サービス</a></li>
-          <li><a href="/about" class="hover:text-white transition-colors">会社概要</a></li>
-          <li><a href="/contact" class="hover:text-white transition-colors">お問い合わせ</a></li>
+          {NAV_LINKS.map((link) => (
+            <li>
+              <a href={link.href} class="hover:text-white transition-colors">{link.label}</a>
+            </li>
+          ))}
         </ul>
       </div>
       <div>
         <h4 class="text-white font-semibold mb-4">お問い合わせ</h4>
         <ul class="space-y-2 text-sm">
-          <li>〒000-0000 東京都○○区○○</li>
-          <li>TEL: 000-0000-0000</li>
-          <li>info@example.com</li>
+          <li>{SITE.contact.address}</li>
+          <li>TEL: {SITE.contact.tel}</li>
+          <li>{SITE.contact.email}</li>
+          <li>{SITE.contact.hours}</li>
         </ul>
       </div>
     </div>
     <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
-      <p>&copy; {year} Company Name. All rights reserved.</p>
+      <p>&copy; {year} {SITE.name}. All rights reserved.</p>
     </div>
   </div>
 </footer>

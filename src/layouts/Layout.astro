@@ -1,23 +1,20 @@
 ---
 import '../styles/global.css';
+import SEOHead from '../components/SEOHead.astro';
 
 interface Props {
   title: string;
   description?: string;
+  ogpImage?: string;
 }
 
-const { title, description = '中小企業向けコーポレートWebサイト' } = Astro.props;
+const { title, description, ogpImage } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="ja">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
-    <meta name="description" content={description} />
+    <SEOHead title={title} description={description} ogpImage={ogpImage} />
   </head>
   <body class="min-h-screen flex flex-col">
     <slot />
