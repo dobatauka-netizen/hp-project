@@ -1,0 +1,27 @@
+---
+interface Props {
+  title: string;
+  subtitle: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+}
+
+const { title, subtitle, ctaLabel = 'お問い合わせ', ctaHref = '/contact' } = Astro.props;
+---
+
+<section class="bg-gradient-to-br from-blue-600 to-blue-800 text-white py-24 px-4">
+  <div class="max-w-4xl mx-auto text-center">
+    <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6">
+      {title}
+    </h1>
+    <p class="text-xl md:text-2xl text-blue-100 mb-10 leading-relaxed">
+      {subtitle}
+    </p>
+    <a
+      href={ctaHref}
+      class="inline-flex items-center px-8 py-4 bg-white text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition-colors text-lg"
+    >
+      {ctaLabel}
+    </a>
+  </div>
+</section>

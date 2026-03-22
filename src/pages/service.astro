@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CTAButton from '../components/CTAButton.astro';
+
+const services = [
+  {
+    title: 'サービス01',
+    desc: 'サービスの詳細な説明文が入ります。お客様の課題に対して具体的にどのようなアプローチで解決するかを説明します。',
+    features: ['特徴1', '特徴2', '特徴3'],
+  },
+  {
+    title: 'サービス02',
+    desc: 'サービスの詳細な説明文が入ります。お客様の課題に対して具体的にどのようなアプローチで解決するかを説明します。',
+    features: ['特徴1', '特徴2', '特徴3'],
+  },
+  {
+    title: 'サービス03',
+    desc: 'サービスの詳細な説明文が入ります。お客様の課題に対して具体的にどのようなアプローチで解決するかを説明します。',
+    features: ['特徴1', '特徴2', '特徴3'],
+  },
+];
+---
+
+<BaseLayout title="サービス | Company Name" description="Company Nameが提供するサービスのご紹介です。">
+  <!-- ページヘッダー -->
+  <section class="bg-gray-900 text-white py-20 px-4">
+    <div class="max-w-4xl mx-auto text-center">
+      <h1 class="text-4xl font-bold mb-4">サービス</h1>
+      <p class="text-gray-400 text-lg">お客様のニーズに合わせたサービスをご提供します。</p>
+    </div>
+  </section>
+
+  <!-- サービス一覧 -->
+  <section class="py-20 px-4 bg-white">
+    <div class="max-w-6xl mx-auto space-y-16">
+      {services.map((service, i) => (
+        <div class={`grid grid-cols-1 md:grid-cols-2 gap-12 items-center ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
+          <div class="bg-gray-100 rounded-2xl aspect-video"></div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">{service.title}</h2>
+            <p class="text-gray-600 leading-relaxed mb-6">{service.desc}</p>
+            <ul class="space-y-2 mb-8">
+              {service.features.map((f) => (
+                <li class="flex items-center gap-2 text-gray-700">
+                  <span class="w-2 h-2 bg-blue-600 rounded-full"></span>
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <CTAButton label="詳しく相談する" href="/contact" />
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-20 px-4 bg-blue-600 text-white text-center">
+    <div class="max-w-2xl mx-auto">
+      <h2 class="text-3xl font-bold mb-4">ご不明な点はお気軽に</h2>
+      <p class="text-blue-100 mb-8">サービスについてのご質問・ご相談を受け付けています。</p>
+      <CTAButton label="お問い合わせ" href="/contact" variant="secondary" />
+    </div>
+  </section>
+</BaseLayout>

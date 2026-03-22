@@ -1,0 +1,38 @@
+---
+const navLinks = [
+  { href: '/', label: 'ホーム' },
+  { href: '/service', label: 'サービス' },
+  { href: '/about', label: '会社概要' },
+  { href: '/contact', label: 'お問い合わせ' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="bg-white shadow-sm sticky top-0 z-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <a href="/" class="text-xl font-bold text-gray-900">
+        Company Name
+      </a>
+      <nav class="hidden md:flex items-center gap-8">
+        {navLinks.map((link) => (
+          <a
+            href={link.href}
+            class={`text-sm font-medium transition-colors hover:text-blue-600 ${
+              currentPath === link.href ? 'text-blue-600' : 'text-gray-600'
+            }`}
+          >
+            {link.label}
+          </a>
+        ))}
+      </nav>
+      <a
+        href="/contact"
+        class="hidden md:inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        無料相談
+      </a>
+    </div>
+  </div>
+</header>

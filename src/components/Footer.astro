@@ -1,0 +1,36 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-gray-900 text-gray-400">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div>
+        <h3 class="text-white font-bold text-lg mb-4">Company Name</h3>
+        <p class="text-sm leading-relaxed">
+          お客様のビジネス成長を<br />全力でサポートします。
+        </p>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold mb-4">メニュー</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="/" class="hover:text-white transition-colors">ホーム</a></li>
+          <li><a href="/service" class="hover:text-white transition-colors">サービス</a></li>
+          <li><a href="/about" class="hover:text-white transition-colors">会社概要</a></li>
+          <li><a href="/contact" class="hover:text-white transition-colors">お問い合わせ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold mb-4">お問い合わせ</h4>
+        <ul class="space-y-2 text-sm">
+          <li>〒000-0000 東京都○○区○○</li>
+          <li>TEL: 000-0000-0000</li>
+          <li>info@example.com</li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
+      <p>&copy; {year} Company Name. All rights reserved.</p>
+    </div>
+  </div>
+</footer>

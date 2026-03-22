@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import CTAButton from '../components/CTAButton.astro';
+---
+
+<BaseLayout title="ホーム | Company Name" description="中小企業のビジネス成長を支援するCompany Nameの公式サイトです。">
+  <Hero
+    title="ビジネスの成長を、ともに。"
+    subtitle="お客様の課題に寄り添い、最適なソリューションをご提供します。"
+    ctaLabel="無料相談はこちら"
+    ctaHref="/contact"
+  />
+
+  <!-- サービス紹介 -->
+  <section class="py-20 px-4 bg-white">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">サービス</h2>
+      <p class="text-center text-gray-600 mb-12">お客様のニーズに合わせた幅広いサービスをご提供しています。</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {[
+          { title: 'サービス01', desc: 'サービスの説明文が入ります。お客様の課題を解決します。' },
+          { title: 'サービス02', desc: 'サービスの説明文が入ります。お客様の課題を解決します。' },
+          { title: 'サービス03', desc: 'サービスの説明文が入ります。お客様の課題を解決します。' },
+        ].map((item) => (
+          <div class="p-8 bg-gray-50 rounded-xl hover:shadow-md transition-shadow">
+            <div class="w-12 h-12 bg-blue-100 rounded-lg mb-4"></div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
+            <p class="text-gray-600 leading-relaxed">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+      <div class="text-center mt-12">
+        <CTAButton label="サービス一覧を見る" href="/service" variant="secondary" />
+      </div>
+    </div>
+  </section>
+
+  <!-- 会社の強み -->
+  <section class="py-20 px-4 bg-blue-50">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">選ばれる理由</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {[
+          { num: '01', title: '豊富な実績', desc: '多くのお客様からご信頼をいただいています。' },
+          { num: '02', title: '専門チーム', desc: '経験豊富な専門家がサポートします。' },
+          { num: '03', title: '迅速対応', desc: 'お客様のご要望に素早くお応えします。' },
+          { num: '04', title: '充実サポート', desc: '導入後も安心のサポート体制を整えています。' },
+        ].map((item) => (
+          <div class="flex gap-4 p-6 bg-white rounded-xl">
+            <span class="text-3xl font-bold text-blue-200">{item.num}</span>
+            <div>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
+              <p class="text-gray-600">{item.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-20 px-4 bg-blue-600 text-white text-center">
+    <div class="max-w-2xl mx-auto">
+      <h2 class="text-3xl font-bold mb-4">まずはお気軽にご相談ください</h2>
+      <p class="text-blue-100 mb-8">無料相談を承っております。お気軽にお問い合わせください。</p>
+      <CTAButton label="無料相談する" href="/contact" variant="secondary" />
+    </div>
+  </section>
+</BaseLayout>
