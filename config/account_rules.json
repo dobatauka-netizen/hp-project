@@ -1,0 +1,60 @@
+{
+  "_comment": "弥生会計 勘定科目判定ルール - 優先順位: 取引先名 > キーワード > 金額補助",
+  "version": "1.0.0",
+
+  "vendor_rules": [
+    {"pattern": "ENEOS|エネオス|出光|コスモ石油|昭和シェル|BP", "account": "車両費", "sub_account": "", "tax_category": "課税仕入", "note": "ガソリンスタンド"},
+    {"pattern": "セブンイレブン|ローソン|ファミリーマート|ミニストップ|デイリーヤマザキ", "account": "会議費", "sub_account": "", "tax_category": "課税仕入", "note": "コンビニ（要確認）"},
+    {"pattern": "Amazon|アマゾン|楽天|Yahoo!ショッピング|ヤフーショッピング", "account": "消耗品費", "sub_account": "", "tax_category": "課税仕入", "note": "ECサイト"},
+    {"pattern": "スターバックス|タリーズ|ドトール|コメダ|カフェ|珈琲", "account": "会議費", "sub_account": "", "tax_category": "課税仕入", "note": "カフェ"},
+    {"pattern": "JR|東急|東武|西武|京急|小田急|メトロ|都営|バス|タクシー|Suica|ICOCA|PiTaPa", "account": "旅費交通費", "sub_account": "", "tax_category": "課税仕入", "note": "交通機関"},
+    {"pattern": "NTT|ドコモ|ソフトバンク|au|KDDI|楽天モバイル", "account": "通信費", "sub_account": "", "tax_category": "課税仕入", "note": "通信会社"},
+    {"pattern": "郵便局|ゆうパック|ヤマト|佐川|クロネコ|日本郵便", "account": "通信費", "sub_account": "", "tax_category": "課税仕入", "note": "郵便・宅配"},
+    {"pattern": "マクドナルド|モスバーガー|吉野家|すき家|松屋|サイゼリヤ|ガスト|ジョナサン", "account": "会議費", "sub_account": "", "tax_category": "課税仕入", "note": "飲食店"},
+    {"pattern": "コクヨ|アスクル|カウネット|LOHACO|ハンズ|ホームセンター", "account": "消耗品費", "sub_account": "", "tax_category": "課税仕入", "note": "事務用品"},
+    {"pattern": "弁護士|司法書士|税理士|会計士|行政書士|社会保険労務士", "account": "支払手数料", "sub_account": "", "tax_category": "課税仕入", "note": "専門家報酬"},
+    {"pattern": "銀行|信用金庫|信用組合|振込手数料", "account": "支払手数料", "sub_account": "", "tax_category": "非課税仕入", "note": "金融機関手数料"},
+    {"pattern": "ホテル|旅館|東横イン|アパホテル|ドーミーイン|ルートイン", "account": "旅費交通費", "sub_account": "", "tax_category": "課税仕入", "note": "宿泊"},
+    {"pattern": "新聞|日経|読売|朝日|毎日|産経|雑誌|書籍|本屋|書店", "account": "新聞図書費", "sub_account": "", "tax_category": "課税仕入", "note": "新聞・書籍"},
+    {"pattern": "電気|ガス|水道|東京電力|関西電力|中部電力|東邦ガス|大阪ガス", "account": "水道光熱費", "sub_account": "", "tax_category": "課税仕入", "note": "公共料金"}
+  ],
+
+  "keyword_rules": [
+    {"pattern": "ガソリン|軽油|灯油|給油", "account": "車両費", "tax_category": "課税仕入"},
+    {"pattern": "高速|ETC|駐車|有料道路", "account": "旅費交通費", "tax_category": "課税仕入"},
+    {"pattern": "会議|打合|打ち合わせ|ミーティング|接待|懇親|歓迎|送別|慰労", "account": "会議費", "tax_category": "課税仕入"},
+    {"pattern": "交通費|電車|バス|タクシー|新幹線|飛行機|航空|出張", "account": "旅費交通費", "tax_category": "課税仕入"},
+    {"pattern": "通信|電話|インターネット|ネット|回線|プロバイダ", "account": "通信費", "tax_category": "課税仕入"},
+    {"pattern": "切手|郵便|宅配|送料|配送", "account": "通信費", "tax_category": "課税仕入"},
+    {"pattern": "消耗品|文具|事務用品|コピー用紙|トナー|インク", "account": "消耗品費", "tax_category": "課税仕入"},
+    {"pattern": "修繕|修理|メンテナンス|保守|点検", "account": "修繕費", "tax_category": "課税仕入"},
+    {"pattern": "広告|宣伝|チラシ|パンフレット|印刷|名刺|HP|ホームページ|Web|ウェブ", "account": "広告宣伝費", "tax_category": "課税仕入"},
+    {"pattern": "研修|セミナー|講習|資格|勉強|教育|訓練", "account": "研修費", "tax_category": "課税仕入"},
+    {"pattern": "保険料|火災保険|自動車保険|生命保険|損害保険", "account": "保険料", "tax_category": "非課税仕入"},
+    {"pattern": "地代|家賃|賃料|賃借|レンタル|リース", "account": "地代家賃", "tax_category": "課税仕入"},
+    {"pattern": "水道|電気|ガス|光熱", "account": "水道光熱費", "tax_category": "課税仕入"},
+    {"pattern": "書籍|図書|雑誌|新聞|参考書", "account": "新聞図書費", "tax_category": "課税仕入"},
+    {"pattern": "手数料|振込|決済|クレジット", "account": "支払手数料", "tax_category": "課税仕入"},
+    {"pattern": "慶弔|祝|香典|御霊前", "account": "福利厚生費", "tax_category": "課税仕入"},
+    {"pattern": "食事|弁当|昼食|夕食|朝食|飲食|ランチ|ディナー", "account": "会議費", "tax_category": "課税仕入"}
+  ],
+
+  "amount_rules": [
+    {"max_amount": 1000, "account": "雑費", "note": "少額（要確認）"},
+    {"min_amount": 100000, "flag_review": true, "note": "高額（要確認）"}
+  ],
+
+  "credit_account_defaults": {
+    "default": "未払金",
+    "cash_keywords": ["現金", "CASH", "手払い"],
+    "credit_card_keywords": ["カード", "VISA", "Mastercard", "JCB", "AMEX", "クレジット"],
+    "bank_keywords": ["振込", "口座引落", "引き落とし", "自動引落"]
+  },
+
+  "tax_rates": {
+    "standard": 0.10,
+    "reduced": 0.08,
+    "exempt": 0.00,
+    "reduced_keywords": ["食料品", "飲料", "食品", "弁当", "惣菜", "お菓子", "新聞"]
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "input_dir": "input",
+  "output_dir": "output",
+  "log_dir": "logs",
+  "rules_file": "config/account_rules.json",
+
+  "yayoi": {
+    "default_credit_account": "未払金",
+    "default_debit_account": "要確認",
+    "encoding": "cp932",
+    "date_format": "%Y/%m/%d"
+  },
+
+  "ocr": {
+    "supported_formats": [".csv", ".xlsx", ".xls"],
+    "column_mappings": {
+      "date": ["日付", "date", "Date", "取引日", "伝票日付"],
+      "amount": ["金額", "amount", "Amount", "合計", "税込金額", "支払金額"],
+      "vendor": ["取引先", "店名", "vendor", "Vendor", "支払先", "相手先"],
+      "description": ["摘要", "内容", "description", "Description", "品目", "件名"],
+      "invoice_number": ["インボイス番号", "登録番号", "invoice", "Invoice", "T番号"]
+    }
+  },
+
+  "validation": {
+    "max_amount": 10000000,
+    "min_date": "2023/01/01",
+    "require_vendor_or_description": true
+  }
+}
