@@ -40,6 +40,7 @@ export const NAV_LINKS = [
   { href: '/service', label: 'サービス' },
   { href: '/about', label: '会社概要' },
   { href: '/contact', label: 'お問い合わせ' },
+  { href: '/cards', label: '名刺管理' },
 ] as const;
 
 // トップページ コンテンツ

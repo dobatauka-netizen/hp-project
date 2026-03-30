@@ -1,0 +1,694 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../config/site';
+---
+
+<BaseLayout title={`名刺管理 | ${SITE.name}`} description="登録した名刺を一覧・検索・管理できます。">
+
+  <div class="min-h-screen bg-gray-50">
+    <!-- ページヘッダー -->
+    <div class="bg-white border-b border-gray-200">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">名刺管理</h1>
+            <p class="text-sm text-gray-500 mt-1">登録した名刺を管理できます</p>
+          </div>
+          <button
+            id="btn-add"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            名刺を追加
+          </button>
+        </div>
+
+        <!-- 検索・フィルター -->
+        <div class="mt-4 flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-1">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input
+              id="search-input"
+              type="text"
+              placeholder="名前・会社名・役職で検索..."
+              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <select
+            id="sort-select"
+            class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          >
+            <option value="newest">新しい順</option>
+            <option value="oldest">古い順</option>
+            <option value="name">名前順</option>
+            <option value="company">会社名順</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- カード一覧 -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- 件数表示 -->
+      <p id="card-count" class="text-sm text-gray-500 mb-4"></p>
+
+      <!-- カードグリッド -->
+      <div id="card-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+      <!-- 空状態 -->
+      <div id="empty-state" class="hidden text-center py-20">
+        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M3 14h18M8 6h.01M8 18h.01M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/>
+        </svg>
+        <p class="text-gray-500 font-medium">名刺が登録されていません</p>
+        <p class="text-gray-400 text-sm mt-1">「名刺を追加」ボタンから名刺を登録してください</p>
+      </div>
+
+      <!-- 検索結果なし -->
+      <div id="no-results" class="hidden text-center py-20">
+        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <p class="text-gray-500 font-medium">検索結果が見つかりません</p>
+        <p class="text-gray-400 text-sm mt-1">別のキーワードで検索してください</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 追加・編集モーダル -->
+  <div id="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div id="modal-backdrop" class="absolute inset-0 bg-black/50"></div>
+    <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+        <h2 id="modal-title" class="text-lg font-bold text-gray-900">名刺を追加</h2>
+        <button id="modal-close" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <form id="card-form" class="px-6 py-4 space-y-4">
+        <input type="hidden" id="form-id" />
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">氏名 <span class="text-red-500">*</span></label>
+            <input id="form-name" type="text" required placeholder="山田 太郎"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">会社名</label>
+            <input id="form-company" type="text" placeholder="株式会社〇〇"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">部署</label>
+            <input id="form-department" type="text" placeholder="営業部"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">役職</label>
+            <input id="form-title" type="text" placeholder="部長"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">メールアドレス</label>
+            <input id="form-email" type="email" placeholder="yamada@example.com"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">電話番号</label>
+            <input id="form-tel" type="tel" placeholder="03-0000-0000"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">携帯電話</label>
+            <input id="form-mobile" type="tel" placeholder="090-0000-0000"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">住所</label>
+            <input id="form-address" type="text" placeholder="〒000-0000 東京都渋谷区..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">ウェブサイト</label>
+            <input id="form-website" type="url" placeholder="https://example.com"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">名刺を受け取った日</label>
+            <input id="form-met-date" type="date"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">タグ <span class="text-gray-400 font-normal">（カンマ区切り）</span></label>
+            <input id="form-tags" type="text" placeholder="顧客, 営業先, 重要"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">メモ</label>
+            <textarea id="form-notes" rows="3" placeholder="備考・メモをここに入力..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button type="button" id="btn-cancel" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
+            キャンセル
+          </button>
+          <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+            保存する
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 削除確認モーダル -->
+  <div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50"></div>
+    <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+          <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-gray-900">名刺を削除</h3>
+          <p class="text-sm text-gray-500">この操作は元に戻せません</p>
+        </div>
+      </div>
+      <p id="delete-message" class="text-sm text-gray-600 mb-6"></p>
+      <div class="flex gap-3">
+        <button id="btn-delete-cancel" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
+          キャンセル
+        </button>
+        <button id="btn-delete-confirm" class="flex-1 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors">
+          削除する
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 詳細モーダル -->
+  <div id="detail-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div id="detail-backdrop" class="absolute inset-0 bg-black/50"></div>
+    <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+        <h2 class="text-lg font-bold text-gray-900">名刺詳細</h2>
+        <button id="detail-close" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div id="detail-content" class="px-6 py-4"></div>
+      <div class="sticky bottom-0 bg-white border-t border-gray-100 px-6 py-4 flex gap-3 rounded-b-2xl">
+        <button id="detail-edit" class="flex-1 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-medium rounded-lg hover:bg-blue-50 transition-colors">
+          編集する
+        </button>
+        <button id="detail-delete" class="px-4 py-2 border border-red-300 text-red-600 text-sm font-medium rounded-lg hover:bg-red-50 transition-colors">
+          削除
+        </button>
+      </div>
+    </div>
+  </div>
+
+</BaseLayout>
+
+<script>
+  // =====================================================================
+  // 型定義
+  // =====================================================================
+  interface BusinessCard {
+    id: string;
+    name: string;
+    company: string;
+    department: string;
+    title: string;
+    email: string;
+    tel: string;
+    mobile: string;
+    address: string;
+    website: string;
+    metDate: string;
+    tags: string[];
+    notes: string;
+    createdAt: string;
+    updatedAt: string;
+  }
+
+  // =====================================================================
+  // ストレージ管理
+  // =====================================================================
+  const STORAGE_KEY = 'business_cards_v1';
+
+  function loadCards(): BusinessCard[] {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveCards(cards: BusinessCard[]): void {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+  }
+
+  function generateId(): string {
+    return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  }
+
+  // =====================================================================
+  // 状態
+  // =====================================================================
+  let cards: BusinessCard[] = loadCards();
+  let searchQuery = '';
+  let sortOrder = 'newest';
+  let deleteTargetId: string | null = null;
+  let detailTargetId: string | null = null;
+
+  // =====================================================================
+  // DOM参照
+  // =====================================================================
+  const cardGrid = document.getElementById('card-grid')!;
+  const cardCount = document.getElementById('card-count')!;
+  const emptyState = document.getElementById('empty-state')!;
+  const noResults = document.getElementById('no-results')!;
+  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
+
+  // 追加・編集モーダル
+  const modal = document.getElementById('modal')!;
+  const modalTitle = document.getElementById('modal-title')!;
+  const cardForm = document.getElementById('card-form') as HTMLFormElement;
+  const formId = document.getElementById('form-id') as HTMLInputElement;
+  const formName = document.getElementById('form-name') as HTMLInputElement;
+  const formCompany = document.getElementById('form-company') as HTMLInputElement;
+  const formDepartment = document.getElementById('form-department') as HTMLInputElement;
+  const formTitle = document.getElementById('form-title') as HTMLInputElement;
+  const formEmail = document.getElementById('form-email') as HTMLInputElement;
+  const formTel = document.getElementById('form-tel') as HTMLInputElement;
+  const formMobile = document.getElementById('form-mobile') as HTMLInputElement;
+  const formAddress = document.getElementById('form-address') as HTMLInputElement;
+  const formWebsite = document.getElementById('form-website') as HTMLInputElement;
+  const formMetDate = document.getElementById('form-met-date') as HTMLInputElement;
+  const formTags = document.getElementById('form-tags') as HTMLInputElement;
+  const formNotes = document.getElementById('form-notes') as HTMLTextAreaElement;
+
+  // 削除モーダル
+  const deleteModal = document.getElementById('delete-modal')!;
+  const deleteMessage = document.getElementById('delete-message')!;
+
+  // 詳細モーダル
+  const detailModal = document.getElementById('detail-modal')!;
+  const detailContent = document.getElementById('detail-content')!;
+
+  // =====================================================================
+  // フィルタ・ソート
+  // =====================================================================
+  function getFilteredCards(): BusinessCard[] {
+    let result = [...cards];
+
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(c =>
+        c.name.toLowerCase().includes(q) ||
+        c.company.toLowerCase().includes(q) ||
+        c.title.toLowerCase().includes(q) ||
+        c.department.toLowerCase().includes(q) ||
+        c.email.toLowerCase().includes(q) ||
+        c.tags.some(t => t.toLowerCase().includes(q))
+      );
+    }
+
+    result.sort((a, b) => {
+      switch (sortOrder) {
+        case 'newest': return b.createdAt.localeCompare(a.createdAt);
+        case 'oldest': return a.createdAt.localeCompare(b.createdAt);
+        case 'name': return a.name.localeCompare(b.name, 'ja');
+        case 'company': return a.company.localeCompare(b.company, 'ja');
+        default: return 0;
+      }
+    });
+
+    return result;
+  }
+
+  // =====================================================================
+  // アバター生成（イニシャル）
+  // =====================================================================
+  function getInitial(name: string): string {
+    return name.trim().charAt(0) || '?';
+  }
+
+  const AVATAR_COLORS = [
+    'bg-blue-500', 'bg-purple-500', 'bg-green-500', 'bg-orange-500',
+    'bg-pink-500', 'bg-teal-500', 'bg-indigo-500', 'bg-red-500',
+  ];
+
+  function getAvatarColor(id: string): string {
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+      hash = (hash + id.charCodeAt(i)) % AVATAR_COLORS.length;
+    }
+    return AVATAR_COLORS[hash];
+  }
+
+  // =====================================================================
+  // レンダリング
+  // =====================================================================
+  function escapeHtml(str: string): string {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function renderCards(): void {
+    const filtered = getFilteredCards();
+
+    emptyState.classList.add('hidden');
+    noResults.classList.add('hidden');
+    cardGrid.innerHTML = '';
+
+    if (cards.length === 0) {
+      emptyState.classList.remove('hidden');
+      cardCount.textContent = '';
+      return;
+    }
+
+    if (filtered.length === 0) {
+      noResults.classList.remove('hidden');
+      cardCount.textContent = `0件（全${cards.length}件中）`;
+      return;
+    }
+
+    cardCount.textContent = searchQuery
+      ? `${filtered.length}件（全${cards.length}件中）`
+      : `全${filtered.length}件`;
+
+    filtered.forEach(card => {
+      const el = document.createElement('div');
+      el.className = 'bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow cursor-pointer group';
+      el.dataset.id = card.id;
+
+      const tagsHtml = card.tags.length > 0
+        ? `<div class="flex flex-wrap gap-1 mt-3">${card.tags.map(t => `<span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded-full">${escapeHtml(t)}</span>`).join('')}</div>`
+        : '';
+
+      const metDateHtml = card.metDate
+        ? `<p class="text-xs text-gray-400 mt-1">受取日: ${card.metDate}</p>`
+        : '';
+
+      el.innerHTML = `
+        <div class="flex items-start gap-3">
+          <div class="w-11 h-11 ${getAvatarColor(card.id)} rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0">
+            ${escapeHtml(getInitial(card.name))}
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="font-bold text-gray-900 truncate">${escapeHtml(card.name)}</h3>
+            ${card.company ? `<p class="text-sm text-gray-600 truncate">${escapeHtml(card.company)}</p>` : ''}
+            ${card.title ? `<p class="text-xs text-gray-400 truncate">${escapeHtml(card.department ? card.department + ' / ' : '')}${escapeHtml(card.title)}</p>` : ''}
+          </div>
+          <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" onclick="event.stopPropagation()">
+            <button class="btn-edit p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" data-id="${escapeHtml(card.id)}" title="編集">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            </button>
+            <button class="btn-delete p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" data-id="${escapeHtml(card.id)}" title="削除">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="mt-3 space-y-1">
+          ${card.email ? `<p class="text-xs text-gray-500 flex items-center gap-1.5"><svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><span class="truncate">${escapeHtml(card.email)}</span></p>` : ''}
+          ${card.tel ? `<p class="text-xs text-gray-500 flex items-center gap-1.5"><svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>${escapeHtml(card.tel)}</p>` : ''}
+        </div>
+        ${tagsHtml}
+        ${metDateHtml}
+      `;
+
+      // カードクリックで詳細表示
+      el.addEventListener('click', () => openDetail(card.id));
+      cardGrid.appendChild(el);
+    });
+
+    // ボタンイベント設定
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = (btn as HTMLElement).dataset.id!;
+        openEditModal(id);
+      });
+    });
+
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = (btn as HTMLElement).dataset.id!;
+        openDeleteModal(id);
+      });
+    });
+  }
+
+  // =====================================================================
+  // 追加・編集モーダル
+  // =====================================================================
+  function openAddModal(): void {
+    modalTitle.textContent = '名刺を追加';
+    cardForm.reset();
+    formId.value = '';
+    modal.classList.remove('hidden');
+    formName.focus();
+  }
+
+  function openEditModal(id: string): void {
+    const card = cards.find(c => c.id === id);
+    if (!card) return;
+
+    modalTitle.textContent = '名刺を編集';
+    formId.value = card.id;
+    formName.value = card.name;
+    formCompany.value = card.company;
+    formDepartment.value = card.department;
+    formTitle.value = card.title;
+    formEmail.value = card.email;
+    formTel.value = card.tel;
+    formMobile.value = card.mobile;
+    formAddress.value = card.address;
+    formWebsite.value = card.website;
+    formMetDate.value = card.metDate;
+    formTags.value = card.tags.join(', ');
+    formNotes.value = card.notes;
+
+    modal.classList.remove('hidden');
+    formName.focus();
+
+    // 詳細モーダルが開いていたら閉じる
+    detailModal.classList.add('hidden');
+  }
+
+  function closeModal(): void {
+    modal.classList.add('hidden');
+  }
+
+  // =====================================================================
+  // 削除モーダル
+  // =====================================================================
+  function openDeleteModal(id: string): void {
+    const card = cards.find(c => c.id === id);
+    if (!card) return;
+    deleteTargetId = id;
+    deleteMessage.textContent = `「${card.name}」の名刺を削除しますか？`;
+    deleteModal.classList.remove('hidden');
+  }
+
+  function closeDeleteModal(): void {
+    deleteModal.classList.add('hidden');
+    deleteTargetId = null;
+  }
+
+  // =====================================================================
+  // 詳細モーダル
+  // =====================================================================
+  function openDetail(id: string): void {
+    const card = cards.find(c => c.id === id);
+    if (!card) return;
+    detailTargetId = id;
+
+    const row = (label: string, value: string, href?: string) => {
+      if (!value) return '';
+      const val = href
+        ? `<a href="${escapeHtml(href)}" class="text-blue-600 hover:underline break-all" target="_blank" rel="noopener">${escapeHtml(value)}</a>`
+        : `<span class="text-gray-900 break-all">${escapeHtml(value)}</span>`;
+      return `<div class="flex gap-3 py-2 border-b border-gray-100 last:border-0">
+        <span class="text-sm text-gray-500 shrink-0 w-24">${escapeHtml(label)}</span>
+        <span class="text-sm flex-1">${val}</span>
+      </div>`;
+    };
+
+    const tagsHtml = card.tags.length > 0
+      ? `<div class="flex gap-3 py-2 border-b border-gray-100">
+          <span class="text-sm text-gray-500 shrink-0 w-24">タグ</span>
+          <div class="flex flex-wrap gap-1">${card.tags.map(t => `<span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded-full">${escapeHtml(t)}</span>`).join('')}</div>
+        </div>`
+      : '';
+
+    detailContent.innerHTML = `
+      <div class="flex items-center gap-4 pb-4 border-b border-gray-100 mb-2">
+        <div class="w-16 h-16 ${getAvatarColor(card.id)} rounded-full flex items-center justify-center text-white font-bold text-2xl shrink-0">
+          ${escapeHtml(getInitial(card.name))}
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-gray-900">${escapeHtml(card.name)}</h3>
+          ${card.company ? `<p class="text-gray-600">${escapeHtml(card.company)}</p>` : ''}
+          ${card.title ? `<p class="text-sm text-gray-400">${escapeHtml(card.department ? card.department + ' / ' : '')}${escapeHtml(card.title)}</p>` : ''}
+        </div>
+      </div>
+      <div class="space-y-0">
+        ${row('メール', card.email, card.email ? `mailto:${card.email}` : undefined)}
+        ${row('電話', card.tel, card.tel ? `tel:${card.tel}` : undefined)}
+        ${row('携帯', card.mobile, card.mobile ? `tel:${card.mobile}` : undefined)}
+        ${row('住所', card.address)}
+        ${row('ウェブ', card.website, card.website)}
+        ${row('受取日', card.metDate)}
+        ${tagsHtml}
+        ${row('メモ', card.notes)}
+        ${row('登録日', new Date(card.createdAt).toLocaleDateString('ja-JP'))}
+      </div>
+    `;
+
+    detailModal.classList.remove('hidden');
+  }
+
+  function closeDetail(): void {
+    detailModal.classList.add('hidden');
+    detailTargetId = null;
+  }
+
+  // =====================================================================
+  // CRUD
+  // =====================================================================
+  function handleFormSubmit(e: Event): void {
+    e.preventDefault();
+
+    const tags = formTags.value
+      .split(',')
+      .map(t => t.trim())
+      .filter(Boolean);
+
+    const now = new Date().toISOString();
+
+    if (formId.value) {
+      // 更新
+      const idx = cards.findIndex(c => c.id === formId.value);
+      if (idx === -1) return;
+      cards[idx] = {
+        ...cards[idx],
+        name: formName.value.trim(),
+        company: formCompany.value.trim(),
+        department: formDepartment.value.trim(),
+        title: formTitle.value.trim(),
+        email: formEmail.value.trim(),
+        tel: formTel.value.trim(),
+        mobile: formMobile.value.trim(),
+        address: formAddress.value.trim(),
+        website: formWebsite.value.trim(),
+        metDate: formMetDate.value,
+        tags,
+        notes: formNotes.value.trim(),
+        updatedAt: now,
+      };
+    } else {
+      // 新規追加
+      const newCard: BusinessCard = {
+        id: generateId(),
+        name: formName.value.trim(),
+        company: formCompany.value.trim(),
+        department: formDepartment.value.trim(),
+        title: formTitle.value.trim(),
+        email: formEmail.value.trim(),
+        tel: formTel.value.trim(),
+        mobile: formMobile.value.trim(),
+        address: formAddress.value.trim(),
+        website: formWebsite.value.trim(),
+        metDate: formMetDate.value,
+        tags,
+        notes: formNotes.value.trim(),
+        createdAt: now,
+        updatedAt: now,
+      };
+      cards.unshift(newCard);
+    }
+
+    saveCards(cards);
+    closeModal();
+    renderCards();
+  }
+
+  function handleDelete(): void {
+    if (!deleteTargetId) return;
+    cards = cards.filter(c => c.id !== deleteTargetId);
+    saveCards(cards);
+    closeDeleteModal();
+    closeDetail();
+    renderCards();
+  }
+
+  // =====================================================================
+  // イベントリスナー
+  // =====================================================================
+  document.getElementById('btn-add')!.addEventListener('click', openAddModal);
+  document.getElementById('modal-close')!.addEventListener('click', closeModal);
+  document.getElementById('btn-cancel')!.addEventListener('click', closeModal);
+  document.getElementById('modal-backdrop')!.addEventListener('click', closeModal);
+  cardForm.addEventListener('submit', handleFormSubmit);
+
+  document.getElementById('btn-delete-cancel')!.addEventListener('click', closeDeleteModal);
+  document.getElementById('btn-delete-confirm')!.addEventListener('click', handleDelete);
+
+  document.getElementById('detail-close')!.addEventListener('click', closeDetail);
+  document.getElementById('detail-backdrop')!.addEventListener('click', closeDetail);
+  document.getElementById('detail-edit')!.addEventListener('click', () => {
+    if (detailTargetId) openEditModal(detailTargetId);
+  });
+  document.getElementById('detail-delete')!.addEventListener('click', () => {
+    if (detailTargetId) {
+      openDeleteModal(detailTargetId);
+      detailModal.classList.add('hidden');
+    }
+  });
+
+  searchInput.addEventListener('input', () => {
+    searchQuery = searchInput.value;
+    renderCards();
+  });
+
+  sortSelect.addEventListener('change', () => {
+    sortOrder = sortSelect.value;
+    renderCards();
+  });
+
+  // Escキーでモーダルを閉じる
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (!modal.classList.contains('hidden')) closeModal();
+      else if (!deleteModal.classList.contains('hidden')) closeDeleteModal();
+      else if (!detailModal.classList.contains('hidden')) closeDetail();
+    }
+  });
+
+  // =====================================================================
+  // 初期レンダリング
+  // =====================================================================
+  renderCards();
+</script>
