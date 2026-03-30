@@ -124,3 +124,20 @@ export const COLORS = {
   dark: '#111827',      // 濃色テキスト
   light: '#f9fafb',     // 背景色
 } as const;
+
+// AIアシスタント設定
+export const ASSISTANT_CONFIG = {
+  // アシスタント機能の有効/無効
+  enabled: true,
+
+  // チャットウィジェットのラベル
+  buttonLabel: 'AIアシスタント',
+  headerTitle: 'AIアシスタント',
+  headerSubtitle: 'ご質問はお気軽にどうぞ',
+  placeholderText: 'メッセージを入力してください...',
+  welcomeMessage: 'こんにちは！お気軽にご質問ください。サービス内容やお問い合わせ方法など、何でもお答えします。',
+
+  // Claude へのシステムプロンプト（サイトの情報を元に回答させます）
+  // SITE 定数の情報が自動的に付与されます。追加情報があればここに記述してください。
+  systemPromptExtra: '',
+} as const;
