@@ -53,10 +53,12 @@ a:hover { text-decoration: underline; }
 }
 .site-logo { display: flex; align-items: center; gap: 12px; }
 .site-logo .logo-icon {
-  width: 48px; height: 48px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--orange), var(--yellow));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
+  width: 52px; height: 52px; border-radius: 50%;
+  overflow: hidden; flex-shrink: 0;
+  background: var(--white);
+}
+.site-logo .logo-icon img {
+  width: 100%; height: 100%; object-fit: contain;
 }
 .site-logo .logo-text { display: flex; flex-direction: column; }
 .site-logo .logo-main {
