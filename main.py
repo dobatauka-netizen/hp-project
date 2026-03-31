@@ -24,12 +24,17 @@ def setup_logging(log_dir: str) -> None:
     Path(log_dir).mkdir(parents=True, exist_ok=True)
     log_file = Path(log_dir) / f"yayoi_import_{datetime.now():%Y%m%d_%H%M%S}.log"
 
+    stream_handler = logging.StreamHandler(sys.stdout)
+    # Windowsコンソールのcp932文字化け対策
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
         handlers=[
             logging.FileHandler(log_file, encoding="utf-8"),
-            logging.StreamHandler(sys.stdout),
+            stream_handler,
         ],
     )
     logging.info(f"ログ出力先: {log_file}")
