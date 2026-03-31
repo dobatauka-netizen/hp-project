@@ -32,11 +32,9 @@
 
 <!-- ヒーロー -->
 <section class="hero">
-  <div style="display:flex; justify-content:center; align-items:center; gap:32px; flex-wrap:wrap; margin-bottom:24px;">
+  <div style="display:flex; justify-content:center; align-items:center; gap:24px; flex-wrap:wrap; margin-bottom:24px;">
     <img src="images/logo.jpg" alt="まぜこぜむらキャラクター"
          style="width:140px; height:140px; object-fit:contain; filter:drop-shadow(0 4px 12px rgba(0,0,0,0.12));">
-    <img src="images/fudebun.jpg" alt="まぜこぜむら筆文字"
-         style="height:130px; object-fit:contain; filter:drop-shadow(0 4px 12px rgba(0,0,0,0.1));">
   </div>
   <h1>みんなが<span>まぜこぜ</span>で<br>暮らせるまちへ</h1>
   <p class="hero-sub">
@@ -48,6 +46,33 @@
     <a href="support.html"    class="btn btn-green">支援・寄付</a>
   </div>
 </section>
+
+<!-- 筆文字 装飾帯 -->
+<div style="
+  width:100%; overflow:hidden; background:var(--cream);
+  padding:20px 0; display:flex; justify-content:center; align-items:center;
+">
+  <div style="
+    position:relative; width:100%; max-width:900px; height:90px;
+    display:flex; justify-content:center; align-items:center; overflow:hidden;
+  ">
+    <img src="images/fudebun.jpg" alt="まぜこぜむら筆文字"
+         style="
+           height:340px;
+           transform: rotate(90deg);
+           transform-origin: center center;
+           object-fit: contain;
+           -webkit-mask-image:
+             linear-gradient(to right,  transparent 0%, black 18%, black 82%, transparent 100%),
+             linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+           -webkit-mask-composite: destination-in;
+           mask-image:
+             linear-gradient(to right,  transparent 0%, black 18%, black 82%, transparent 100%),
+             linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+           mask-composite: intersect;
+         ">
+  </div>
+</div>
 
 <!-- ミッション -->
 <section class="section-bg-white">
