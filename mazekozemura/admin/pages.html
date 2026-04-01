@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ページ画像管理｜まぜこぜむら 管理画面</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <style>
+    .img-slot-card {
+      border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden; background: var(--white);
+      box-shadow: var(--shadow);
+    }
+    .img-slot-preview {
+      height: 160px;
+      background: #F1F5F9 center/cover no-repeat;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .img-slot-empty { text-align: center; color: var(--text-sub); font-size: 13px; }
+    .img-slot-footer { padding: 14px 16px; }
+    .img-slot-label { font-size: 13px; font-weight: 700; color: var(--text); }
+    .img-slot-progress { font-size: 12px; color: var(--accent); margin-top: 6px; min-height: 16px; }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- サイドバー -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="../images/logo.png" alt="まぜこぜむら">
+      <div>
+        <div class="sidebar-logo-text">まぜこぜむら</div>
+        <div class="sidebar-logo-sub">管理画面</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">メイン</div>
+      <a href="dashboard.html" class="nav-link">
+        <span class="nav-icon">🏠</span> ダッシュボード
+      </a>
+      <div class="nav-section">コンテンツ管理</div>
+      <a href="news.html" class="nav-link">
+        <span class="nav-icon">📰</span> お知らせ管理
+      </a>
+      <a href="pages.html" class="nav-link active">
+        <span class="nav-icon">🖼️</span> ページ画像管理
+      </a>
+      <div class="nav-section">設定</div>
+      <a href="admins.html" class="nav-link">
+        <span class="nav-icon">👥</span> 管理者管理
+      </a>
+      <a href="../index.html" class="nav-link" target="_blank">
+        <span class="nav-icon">🌐</span> 公開サイトを見る
+        <span class="nav-external">↗</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user-email" id="admin-user-email"></div>
+      <button class="btn-logout" id="logout-btn">ログアウト</button>
+    </div>
+  </aside>
+
+  <!-- メインエリア -->
+  <main class="admin-main">
+    <div class="topbar">
+      <span class="topbar-title">ページ画像管理</span>
+      <span style="font-size:13px;color:#64748B;">画像をアップロードするとサイトに即時反映されます</span>
+    </div>
+    <div class="admin-content">
+      <div id="slots-container">
+        <p style="color:#64748B;">読み込み中…</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast-container"></div>
+<script type="module" src="js/pages.js"></script>
+</body>
+</html>
