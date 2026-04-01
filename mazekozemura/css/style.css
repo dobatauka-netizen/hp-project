@@ -92,6 +92,15 @@ a:hover { opacity: 0.75; text-decoration: underline; }
 .a11y-btn[data-font-size="medium"] { font-size: 12px; }
 .a11y-btn[data-font-size="large"]  { font-size: 14px; }
 
+/* ── ロゴ画像 ──────────────────────────────── */
+.logo-img { height: 48px; width: auto; display: block; }
+.hero-illust {
+  width: min(320px, 80%);
+  margin: 0 auto 24px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+
 /* ── ヘッダー ──────────────────────────────── */
 .site-header {
   background: var(--white);
