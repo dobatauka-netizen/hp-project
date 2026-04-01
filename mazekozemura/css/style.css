@@ -418,6 +418,19 @@ section { padding: 88px 0; }
 }
 .form-group textarea { height: 180px; resize: vertical; }
 
+/* ── ボタン追加定義 ─────────────────────────── */
+.btn-outline-white {
+  background: transparent;
+  color: var(--white);
+  border: 2px solid var(--white);
+  padding: 14px 32px; border-radius: 50px;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; display: inline-block;
+  transition: background 0.2s, color 0.2s;
+  min-height: 44px;
+}
+.btn-outline-white:hover { background: rgba(255,255,255,0.15); text-decoration: none; opacity: 1; }
+
 /* ── レスポンシブ ──────────────────────────── */
 @media (max-width: 768px) {
   .site-nav { display: none; }
