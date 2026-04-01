@@ -1,12 +1,17 @@
-import { db } from './firebase-config.js';
+import { db, storage } from './firebase-config.js';
 import { requireAuth, logout, showToast, confirmDialog, formatDate, CATEGORY_LABELS, CATEGORY_CLASSES } from './auth.js';
 import {
   collection, getDocs, addDoc, updateDoc, deleteDoc,
   doc, query, orderBy, Timestamp, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import {
+  ref, uploadBytesResumable, getDownloadURL, deleteObject
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
 
-let allDocs = [];
-let editingId = null;
+let allDocs    = [];
+let editingId  = null;
+let selectedFile = null;  // アップロード予定の画像ファイル
+let currentImageUrl = ''; // 現在保存されている画像URL
 
 requireAuth(async () => {
   document.getElementById('logout-btn').addEventListener('click', logout);
@@ -45,7 +50,10 @@ function renderTable(docs) {
     <tr data-id="${d.id}">
       <td style="white-space:nowrap">${formatDate(d.date)}</td>
       <td><span class="badge ${CATEGORY_CLASSES[d.category] || ''}">${CATEGORY_LABELS[d.category] || d.category}</span></td>
-      <td style="max-width:340px">${escHtml(d.title)}</td>
+      <td style="max-width:300px">
+        ${d.imageUrl ? `<img src="${d.imageUrl}" style="height:36px;width:52px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:8px;">` : ''}
+        ${escHtml(d.title)}
+      </td>
       <td><span class="badge ${d.published ? 'badge-pub' : 'badge-draft'}">${d.published ? '公開中' : '下書き'}</span></td>
       <td>
         <div style="display:flex;gap:6px">
@@ -58,30 +66,83 @@ function renderTable(docs) {
 
 /* ─── イベントバインド ─── */
 function bindEvents() {
-  // 新規作成ボタン
   document.getElementById('btn-new').addEventListener('click', () => openModal(null));
-
-  // モーダル閉じる
   document.getElementById('modal-close').addEventListener('click', closeModal);
   document.getElementById('btn-cancel').addEventListener('click', closeModal);
   document.getElementById('modal-overlay').addEventListener('click', (e) => {
     if (e.target === e.currentTarget) closeModal();
   });
-
-  // フォーム送信
   document.getElementById('news-form').addEventListener('submit', saveNews);
-
-  // フィルター
   document.getElementById('filter-cat').addEventListener('change', applyFilter);
   document.getElementById('filter-status').addEventListener('change', applyFilter);
   document.getElementById('search-input').addEventListener('input', applyFilter);
+
+  // 画像アップロード
+  const uploadArea = document.getElementById('image-upload-area');
+  const fileInput  = document.getElementById('f-image');
+
+  uploadArea.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => handleFileSelect(fileInput.files[0]));
+
+  // ドラッグ＆ドロップ
+  uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+  uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+  uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    handleFileSelect(e.dataTransfer.files[0]);
+  });
+
+  document.getElementById('btn-change-image').addEventListener('click', (e) => {
+    e.stopPropagation();
+    fileInput.click();
+  });
+  document.getElementById('btn-remove-image').addEventListener('click', (e) => {
+    e.stopPropagation();
+    clearImagePreview();
+    selectedFile = null;
+    currentImageUrl = '';
+  });
 }
 
+function handleFileSelect(file) {
+  if (!file || !file.type.startsWith('image/')) {
+    showToast('画像ファイルを選択してください', 'error');
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('5MB以下の画像を選択してください', 'error');
+    return;
+  }
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = (e) => showImagePreview(e.target.result);
+  reader.readAsDataURL(file);
+}
+
+function showImagePreview(src) {
+  document.getElementById('image-placeholder').style.display = 'none';
+  const preview = document.getElementById('image-preview');
+  preview.src = src;
+  preview.style.display = 'block';
+  const actions = document.getElementById('image-actions');
+  actions.style.display = 'flex';
+}
+
+function clearImagePreview() {
+  document.getElementById('image-placeholder').style.display = '';
+  document.getElementById('image-preview').style.display = 'none';
+  document.getElementById('image-preview').src = '';
+  document.getElementById('image-actions').style.display = 'none';
+  document.getElementById('f-image').value = '';
+  document.getElementById('f-image-url').value = '';
+}
+
+/* ─── フィルター ─── */
 function applyFilter() {
   const cat    = document.getElementById('filter-cat').value;
   const status = document.getElementById('filter-status').value;
   const kw     = document.getElementById('search-input').value.toLowerCase();
-
   const filtered = allDocs.filter(d => {
     if (cat    && d.category !== cat)              return false;
     if (status === 'pub'   && !d.published)         return false;
@@ -95,26 +156,30 @@ function applyFilter() {
 /* ─── モーダル ─── */
 function openModal(id) {
   editingId = id;
-  const form = document.getElementById('news-form');
-  form.reset();
-
-  const title = document.getElementById('modal-title');
+  selectedFile = null;
+  currentImageUrl = '';
+  document.getElementById('news-form').reset();
+  clearImagePreview();
 
   if (id) {
-    title.textContent = '記事を編集';
+    document.getElementById('modal-title').textContent = '記事を編集';
     const item = allDocs.find(d => d.id === id);
     if (!item) return;
-    document.getElementById('f-title').value     = item.title;
-    document.getElementById('f-category').value  = item.category;
-    document.getElementById('f-body').value      = item.body || '';
+    document.getElementById('f-title').value      = item.title;
+    document.getElementById('f-category').value   = item.category;
+    document.getElementById('f-body').value       = item.body || '';
     document.getElementById('f-published').checked = item.published;
-    // 日付変換 (Timestamp → input[date] 形式)
     if (item.date) {
       const dt = item.date.toDate();
       document.getElementById('f-date').value = dt.toISOString().slice(0, 10);
     }
+    if (item.imageUrl) {
+      currentImageUrl = item.imageUrl;
+      document.getElementById('f-image-url').value = item.imageUrl;
+      showImagePreview(item.imageUrl);
+    }
   } else {
-    title.textContent = '新規記事を作成';
+    document.getElementById('modal-title').textContent = '新規記事を作成';
     document.getElementById('f-date').value = new Date().toISOString().slice(0, 10);
     document.getElementById('f-published').checked = true;
   }
@@ -126,6 +191,31 @@ function openModal(id) {
 function closeModal() {
   document.getElementById('modal-overlay').classList.add('hidden');
   editingId = null;
+  selectedFile = null;
+}
+
+/* ─── 画像アップロード ─── */
+async function uploadImage(file) {
+  const ext      = file.name.split('.').pop();
+  const filename = `news-images/${Date.now()}.${ext}`;
+  const storageRef = ref(storage, filename);
+  const progressEl = document.getElementById('upload-progress');
+
+  return new Promise((resolve, reject) => {
+    const task = uploadBytesResumable(storageRef, file);
+    task.on('state_changed',
+      (snap) => {
+        const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
+        progressEl.textContent = `アップロード中… ${pct}%`;
+      },
+      (err) => { progressEl.textContent = ''; reject(err); },
+      async () => {
+        progressEl.textContent = '';
+        const url = await getDownloadURL(task.snapshot.ref);
+        resolve(url);
+      }
+    );
+  });
 }
 
 /* ─── 保存 ─── */
@@ -135,17 +225,24 @@ async function saveNews(e) {
   saveBtn.disabled = true;
   saveBtn.textContent = '保存中…';
 
-  const dateVal = document.getElementById('f-date').value;
-  const data = {
-    title:     document.getElementById('f-title').value.trim(),
-    category:  document.getElementById('f-category').value,
-    body:      document.getElementById('f-body').value.trim(),
-    published: document.getElementById('f-published').checked,
-    date:      Timestamp.fromDate(new Date(dateVal)),
-    updatedAt: serverTimestamp(),
-  };
-
   try {
+    // 画像アップロード
+    let imageUrl = currentImageUrl;
+    if (selectedFile) {
+      imageUrl = await uploadImage(selectedFile);
+    }
+
+    const dateVal = document.getElementById('f-date').value;
+    const data = {
+      title:     document.getElementById('f-title').value.trim(),
+      category:  document.getElementById('f-category').value,
+      body:      document.getElementById('f-body').value.trim(),
+      published: document.getElementById('f-published').checked,
+      date:      Timestamp.fromDate(new Date(dateVal)),
+      imageUrl:  imageUrl || '',
+      updatedAt: serverTimestamp(),
+    };
+
     if (editingId) {
       await updateDoc(doc(db, 'news', editingId), data);
       showToast('記事を更新しました');
@@ -164,12 +261,20 @@ async function saveNews(e) {
   }
 }
 
-/* ─── グローバル関数（テーブルのonclick用） ─── */
+/* ─── グローバル関数 ─── */
 window.editNews = (id) => openModal(id);
 window.deleteNews = async (id) => {
   const ok = await confirmDialog('記事を削除しますか？', 'この操作は元に戻せません。');
   if (!ok) return;
   try {
+    const item = allDocs.find(d => d.id === id);
+    // Storage の画像も削除
+    if (item?.imageUrl) {
+      try {
+        const imgRef = ref(storage, item.imageUrl);
+        await deleteObject(imgRef);
+      } catch (_) { /* 画像が存在しない場合は無視 */ }
+    }
     await deleteDoc(doc(db, 'news', id));
     showToast('記事を削除しました');
     await loadNews();

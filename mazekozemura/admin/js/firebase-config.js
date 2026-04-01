@@ -7,6 +7,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth }        from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore }   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getStorage }     from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
 
 // ↓↓↓ この部分をFirebaseコンソールから取得した値に書き換えてください ↓↓↓
 const firebaseConfig = {
@@ -21,5 +22,6 @@ const firebaseConfig = {
 // ↑↑↑ ここまで書き換え ↑↑↑
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db   = getFirestore(app);
+export const auth    = getAuth(app);
+export const db      = getFirestore(app);
+export const storage = getStorage(app);

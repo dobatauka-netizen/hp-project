@@ -257,5 +257,18 @@ img { max-width: 100%; height: auto; display: block; }
 .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
 .page-header h2 { font-size: 20px; font-weight: 700; }
 
+/* ── 画像アップロード ─────────────────────────── */
+.image-upload-area {
+  border: 2px dashed var(--border); border-radius: 10px;
+  padding: 24px; text-align: center; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  min-height: 120px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.image-upload-area:hover, .image-upload-area.dragover {
+  border-color: var(--accent); background: #FEF5EC;
+}
+.image-placeholder { pointer-events: none; }
+
 /* ── ローディング ───────────────────────────── */
 .loading-row td { text-align: center; padding: 40px; color: var(--text-sub); }
