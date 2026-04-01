@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理者管理｜まぜこぜむら 管理画面</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- サイドバー -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="../images/logo.png" alt="まぜこぜむら">
+      <div>
+        <div class="sidebar-logo-text">まぜこぜむら</div>
+        <div class="sidebar-logo-sub">管理画面</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">メイン</div>
+      <a href="dashboard.html" class="nav-link">
+        <span class="nav-icon">🏠</span> ダッシュボード
+      </a>
+      <div class="nav-section">コンテンツ管理</div>
+      <a href="news.html" class="nav-link">
+        <span class="nav-icon">📰</span> お知らせ管理
+      </a>
+      <a href="events.html" class="nav-link">
+        <span class="nav-icon">📅</span> イベント管理
+      </a>
+      <div class="nav-section">設定</div>
+      <a href="admins.html" class="nav-link active">
+        <span class="nav-icon">👥</span> 管理者管理
+      </a>
+      <a href="../index.html" class="nav-link" target="_blank">
+        <span class="nav-icon">🌐</span> 公開サイトを見る
+        <span class="nav-external">↗</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user-email" id="admin-user-email"></div>
+      <button class="btn-logout" id="logout-btn">ログアウト</button>
+    </div>
+  </aside>
+
+  <!-- メインエリア -->
+  <main class="admin-main">
+    <div class="topbar">
+      <span class="topbar-title">管理者管理</span>
+      <button class="btn btn-primary" id="btn-add-admin">＋ 管理者を追加</button>
+    </div>
+    <div class="admin-content">
+
+      <div class="admin-card" style="margin-bottom:16px;">
+        <div class="admin-card-body" style="padding:14px 20px;background:#FEF3C7;border-radius:12px;">
+          <p style="font-size:13px;color:#92400E;">
+            ⚠️ 現在ログイン中：<strong id="current-email"></strong>　／
+            管理者を削除した場合、Firebaseコンソールからも認証ユーザーを削除してください。
+          </p>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h3>管理者一覧 <span style="font-size:13px;font-weight:400;color:#64748B;margin-left:8px;"><span id="admin-count">0</span> 名</span></h3>
+        </div>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>メールアドレス</th>
+              <th>名前</th>
+              <th style="width:100px">操作</th>
+            </tr>
+          </thead>
+          <tbody id="admin-tbody">
+            <tr class="loading-row"><td colspan="3">読み込み中…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- 管理者追加モーダル -->
+<div class="modal-overlay hidden" id="add-modal">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header">
+      <h3>管理者を追加</h3>
+      <button class="modal-close" id="modal-close">×</button>
+    </div>
+    <form id="add-form">
+      <div class="form-group">
+        <label>メールアドレス <span style="color:#EF4444">*</span></label>
+        <input type="email" id="new-email" placeholder="admin@example.com" required>
+      </div>
+      <div class="form-group">
+        <label>名前（表示用）</label>
+        <input type="text" id="new-name" placeholder="大串 和義">
+      </div>
+      <div class="form-group">
+        <label>初期パスワード <span style="color:#EF4444">*</span></label>
+        <input type="password" id="new-password" placeholder="6文字以上" required minlength="6">
+        <p style="font-size:12px;color:#64748B;margin-top:6px;">追加後、本人にパスワードをお知らせください。</p>
+      </div>
+      <span id="add-error" class="error-msg"></span>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" id="btn-cancel">キャンセル</button>
+        <button type="submit" class="btn btn-primary" id="btn-save">追加する</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 確認ダイアログ -->
+<div class="confirm-overlay hidden" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">⚠️</div>
+    <h4 id="confirm-title"></h4>
+    <p id="confirm-msg"></p>
+    <div class="confirm-btns">
+      <button class="btn btn-ghost" id="confirm-cancel">キャンセル</button>
+      <button class="btn btn-danger" id="confirm-ok">削除する</button>
+    </div>
+  </div>
+</div>
+
+<!-- トースト -->
+<div id="toast-container"></div>
+
+<script type="module" src="js/admins.js"></script>
+</body>
+</html>

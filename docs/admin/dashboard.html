@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ダッシュボード｜まぜこぜむら 管理画面</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- サイドバー -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="../images/logo.png" alt="まぜこぜむら">
+      <div>
+        <div class="sidebar-logo-text">まぜこぜむら</div>
+        <div class="sidebar-logo-sub">管理画面</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">メイン</div>
+      <a href="dashboard.html" class="nav-link active">
+        <span class="nav-icon">🏠</span> ダッシュボード
+      </a>
+      <div class="nav-section">コンテンツ管理</div>
+      <a href="news.html" class="nav-link">
+        <span class="nav-icon">📰</span> お知らせ管理
+      </a>
+      <a href="events.html" class="nav-link">
+        <span class="nav-icon">📅</span> イベント管理
+      </a>
+      <div class="nav-section">設定</div>
+      <a href="admins.html" class="nav-link">
+        <span class="nav-icon">👥</span> 管理者管理
+      </a>
+      <a href="../index.html" class="nav-link" target="_blank">
+        <span class="nav-icon">🌐</span> 公開サイトを見る
+        <span class="nav-external">↗</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user-email" id="admin-user-email"></div>
+      <button class="btn-logout" id="logout-btn">ログアウト</button>
+    </div>
+  </aside>
+
+  <!-- メインエリア -->
+  <main class="admin-main">
+    <div class="topbar">
+      <span class="topbar-title">ダッシュボード</span>
+    </div>
+    <div class="admin-content">
+
+      <!-- 統計 -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">お知らせ 合計</div>
+          <div class="stat-value" id="stat-news-all">—</div>
+          <div class="stat-sub">全記事数</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">お知らせ 公開中</div>
+          <div class="stat-value" id="stat-news-pub">—</div>
+          <div class="stat-sub">公開されている記事</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">クイックリンク</div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;">
+            <a href="news.html" class="btn btn-sm btn-primary">記事を追加</a>
+            <a href="../contact.html" target="_blank" class="btn btn-sm btn-ghost">お問い合わせ確認</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 最近の記事 -->
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h3>最近のお知らせ</h3>
+          <a href="news.html" class="btn btn-sm btn-ghost">すべて見る →</a>
+        </div>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>日付</th>
+              <th>カテゴリ</th>
+              <th>タイトル</th>
+              <th>状態</th>
+            </tr>
+          </thead>
+          <tbody id="recent-news-body">
+            <tr class="loading-row"><td colspan="4">読み込み中…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- トースト -->
+<div id="toast-container"></div>
+
+<script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
