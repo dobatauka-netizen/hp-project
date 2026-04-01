@@ -10,12 +10,13 @@ import { getFirestore }   from 'https://www.gstatic.com/firebasejs/10.12.0/fireb
 
 // ↓↓↓ この部分をFirebaseコンソールから取得した値に書き換えてください ↓↓↓
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+  apiKey:            "AIzaSyA6Z_h9yY_BhG3QwHBPt7EZYJAFiQbiNb8",
+  authDomain:        "mazekozemura-web.firebaseapp.com",
+  projectId:         "mazekozemura-web",
+  storageBucket:     "mazekozemura-web.firebasestorage.app",
+  messagingSenderId: "82198995339",
+  appId:             "1:82198995339:web:b9d4eb16a78a6fc3678f8e",
+  measurementId:     "G-B9WRFB3H80"
 };
 // ↑↑↑ ここまで書き換え ↑↑↑
 
