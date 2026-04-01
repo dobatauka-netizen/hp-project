@@ -11,6 +11,10 @@ import {
 const SLOTS = [
   /* トップページ */
   { page: 'トップページ', key: 'hero-main',           label: 'ヒーロー メインビジュアル' },
+  { page: 'トップページ', key: 'mission-barrier',     label: 'ミッション①バリアをなくす' },
+  { page: 'トップページ', key: 'mission-support',     label: 'ミッション②ともに支え合う' },
+  { page: 'トップページ', key: 'mission-connect',     label: 'ミッション③つながりを育む' },
+  { page: 'トップページ', key: 'mission-place',       label: 'ミッション④居場所をつくる' },
   /* 活動内容 */
   { page: '活動内容',     key: 'activity-01-visual',  label: '月1まぜこぜむら 写真' },
   { page: '活動内容',     key: 'activity-02-visual',  label: 'まぜこぜカフェ 写真' },
@@ -18,10 +22,18 @@ const SLOTS = [
   { page: '活動内容',     key: 'activity-04-visual',  label: 'デイサービス訪問 写真' },
   { page: '活動内容',     key: 'activity-05-visual',  label: 'おにぎりカフェ 写真（計画中）' },
   /* 団体概要 */
+  { page: '団体概要',     key: 'vision-mission',      label: 'ビジョン①ミッション' },
+  { page: '団体概要',     key: 'vision-vision',       label: 'ビジョン②ビジョン' },
+  { page: '団体概要',     key: 'vision-value',        label: 'ビジョン③バリュー' },
   { page: '団体概要',     key: 'about-representative',label: '代表者 写真' },
   { page: '団体概要',     key: 'story-image',          label: '設立の経緯 イメージ' },
   /* 支援ページ */
   { page: '支援ページ',   key: 'support-main',         label: '支援ページ メインビジュアル' },
+  { page: '支援ページ',   key: 'support-donate',       label: '支援方法①オンライン寄付' },
+  { page: '支援ページ',   key: 'support-join',         label: '支援方法②活動に参加する' },
+  { page: '支援ページ',   key: 'support-share',        label: '支援方法③広めてもらう' },
+  /* お問い合わせ */
+  { page: 'お問い合わせ', key: 'contact-main',         label: 'お問い合わせ メイン画像' },
 ];
 
 let imageData = {}; // { [key]: url }
