@@ -5,9 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>一般社団法人まぜこぜむら｜みんながまぜこぜで暮らすまちへ</title>
   <meta name="description" content="障がい者・健常者・高齢者・マイノリティ・子どもたちが、まぜこぜで共存共栄できる社会を創ります。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+<!-- アクセシビリティバー -->
+<div class="a11y-bar" role="toolbar" aria-label="アクセシビリティ設定">
+  <div class="a11y-inner">
+    <span class="a11y-label">文字サイズ：</span>
+    <button class="a11y-btn" data-font-size="small" aria-label="文字を小さく">A<small>-</small></button>
+    <button class="a11y-btn" data-font-size="medium" aria-label="標準文字サイズ">A</button>
+    <button class="a11y-btn" data-font-size="large" aria-label="文字を大きく">A<big>+</big></button>
+    <span class="a11y-sep" aria-hidden="true">|</span>
+    <button class="a11y-btn" id="contrast-toggle" aria-pressed="false">コントラスト</button>
+    <button class="a11y-btn" id="ruby-toggle" aria-pressed="false">ふりがな</button>
+  </div>
+</div>
 
 <!-- ヘッダー -->
 <header class="site-header">
@@ -19,7 +35,7 @@
         <span class="logo-sub">一般社団法人</span>
       </div>
     </a>
-    <nav class="site-nav">
+    <nav class="site-nav" id="nav-menu" aria-label="メインナビゲーション">
       <a href="index.html" class="active">トップ</a>
       <a href="about.html">団体概要</a>
       <a href="activities.html">活動内容</a>
@@ -27,25 +43,32 @@
       <a href="contact.html">お問い合わせ</a>
       <a href="support.html" class="nav-donate">支援する</a>
     </nav>
+    <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="メニューを開閉する">
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-label">メニュー</span>
+    </button>
   </div>
 </header>
 
 <!-- ヒーロー -->
 <section class="hero">
-  <div class="hero-icons">
-    <span>👴</span><span>👩</span><span>🧑‍🦽</span><span>🧒</span><span>🧓</span>
-  </div>
-  <h1>みんなが<span>まぜこぜ</span>で<br>暮らせるまちへ</h1>
-  <p class="hero-sub">
-    障がい者・健常者・高齢者・マイノリティ・子どもたち。<br>
-    ちがいを超えて、ともに笑い、ともに育つコミュニティをつくります。
-  </p>
-  <div class="hero-btns">
-    <a href="activities.html" class="btn btn-primary">活動を見る</a>
-    <a href="support.html"    class="btn btn-green">支援・寄付</a>
+  <div class="hero-inner">
+    <div class="hero-icons" aria-hidden="true">
+      <span>👴</span><span>👩</span><span>🧑‍🦽</span><span>🧒</span><span>🧓</span>
+    </div>
+    <h1>みんなが<span class="hero-highlight">まぜこぜ</span>で<br>暮らせるまちへ</h1>
+    <p class="hero-sub">
+      障がい者・健常者・高齢者・マイノリティ・子どもたち。<br>
+      ちがいを超えて、ともに笑い、ともに育つコミュニティをつくります。
+    </p>
+    <div class="hero-btns">
+      <a href="activities.html" class="btn btn-primary">活動を見る</a>
+      <a href="support.html"    class="btn btn-green">支援・寄付</a>
+    </div>
   </div>
 </section>
-
 
 <!-- ミッション -->
 <section class="section-bg-white">
@@ -58,24 +81,24 @@
         だれもが自分らしく生きられる場所をつくります。
       </p>
     </div>
-<div class="mission-grid">
+    <div class="mission-grid">
       <div class="mission-card">
-        <div class="card-icon">🚧</div>
+        <div class="card-icon" aria-hidden="true">🚧</div>
         <h3>バリアをなくす</h3>
         <p>障がいのあるなし、年齢、国籍、あらゆるちがいによって生まれる見えないバリアを取り除きます。</p>
       </div>
       <div class="mission-card">
-        <div class="card-icon">🤝</div>
+        <div class="card-icon" aria-hidden="true">🤝</div>
         <h3>ともに支え合う</h3>
         <p>助ける側・助けられる側ではなく、お互いが支え合える関係を地域の中に育てます。</p>
       </div>
       <div class="mission-card">
-        <div class="card-icon">🌱</div>
+        <div class="card-icon" aria-hidden="true">🌱</div>
         <h3>つながりを育む</h3>
         <p>月例の集まりや菜園など、継続的な活動を通じてゆっくりと深まる人と人のつながりを大切にします。</p>
       </div>
       <div class="mission-card">
-        <div class="card-icon">🏡</div>
+        <div class="card-icon" aria-hidden="true">🏡</div>
         <h3>居場所をつくる</h3>
         <p>「ここに来たら誰かに会える」そんな安心できる居場所を地域に根ざして作り続けます。</p>
       </div>
@@ -94,7 +117,7 @@
     <div class="activities-grid">
       <div class="activity-card">
         <div class="activity-card-head">
-          <div class="act-icon color-orange">☕</div>
+          <div class="act-icon color-orange" aria-hidden="true">☕</div>
           <div>
             <h3>月1まぜこぜむら</h3>
             <span class="act-freq">毎月第3水曜日 10:30〜16:00</span>
@@ -106,7 +129,7 @@
       </div>
       <div class="activity-card">
         <div class="activity-card-head">
-          <div class="act-icon color-yellow">🍵</div>
+          <div class="act-icon color-yellow" aria-hidden="true">🍵</div>
           <div>
             <h3>まぜこぜカフェ</h3>
             <span class="act-freq">毎月第1土曜日 14:00〜16:00</span>
@@ -118,7 +141,7 @@
       </div>
       <div class="activity-card">
         <div class="activity-card-head">
-          <div class="act-icon color-green">🌿</div>
+          <div class="act-icon color-green" aria-hidden="true">🌿</div>
           <div>
             <h3>まぜこぜ菜園</h3>
             <span class="act-freq">1〜2ヶ月に1回・不定期</span>
@@ -130,7 +153,7 @@
       </div>
       <div class="activity-card">
         <div class="activity-card-head">
-          <div class="act-icon color-blue">🏥</div>
+          <div class="act-icon color-blue" aria-hidden="true">🏥</div>
           <div>
             <h3>デイサービス訪問</h3>
             <span class="act-freq">1〜2ヶ月に1回・不定期</span>
@@ -142,7 +165,7 @@
       </div>
       <div class="activity-card">
         <div class="activity-card-head">
-          <div class="act-icon color-orange">🍙</div>
+          <div class="act-icon color-orange" aria-hidden="true">🍙</div>
           <div>
             <h3>おにぎりユニバーサルカフェ計画</h3>
             <span class="act-freq">常設の場として計画中</span>
@@ -203,7 +226,7 @@
       </p>
       <div class="support-btns">
         <a href="support.html" class="btn btn-white">寄付・支援について</a>
-        <a href="contact.html" class="btn btn-secondary" style="background:transparent; color:white; border-color:white;">参加・問い合わせ</a>
+        <a href="contact.html" class="btn btn-outline-white">参加・問い合わせ</a>
       </div>
     </div>
   </div>
@@ -245,5 +268,11 @@
   </div>
 </footer>
 
+<!-- フローティングCTA -->
+<div id="float-cta" aria-hidden="true">
+  <a href="support.html" class="btn btn-primary">支援する</a>
+</div>
+
+<script src="js/main.js"></script>
 </body>
 </html>
