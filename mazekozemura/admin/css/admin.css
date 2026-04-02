@@ -181,8 +181,9 @@ img { max-width: 100%; height: auto; display: block; }
 .btn-danger   { background: var(--danger); color: white; }
 .btn-ghost    { background: #F1F5F9; color: var(--text); }
 .btn-sm { padding: 5px 12px; font-size: 13px; border-radius: 6px; min-height: 30px; }
-.btn-edit   { background: #EFF6FF; color: #1D4ED8; }
-.btn-delete { background: #FEF2F2; color: #DC2626; }
+.btn-edit      { background: #EFF6FF; color: #1D4ED8; }
+.btn-delete    { background: #FEF2F2; color: #DC2626; }
+.btn-secondary { background: #F1F5F9; color: #475569; border: 1px solid #CBD5E1; }
 
 /* ── フォーム ───────────────────────────────── */
 .form-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

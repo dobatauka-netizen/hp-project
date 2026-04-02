@@ -10,11 +10,13 @@ import {
 /* ─── 画像スロット定義 ─── */
 const SLOTS = [
   /* トップページ */
-  { page: 'トップページ', key: 'hero-main',           label: 'ヒーロー メインビジュアル' },
-  { page: 'トップページ', key: 'mission-barrier',     label: 'ミッション①バリアをなくす' },
-  { page: 'トップページ', key: 'mission-support',     label: 'ミッション②ともに支え合う' },
-  { page: 'トップページ', key: 'mission-connect',     label: 'ミッション③つながりを育む' },
-  { page: 'トップページ', key: 'mission-place',       label: 'ミッション④居場所をつくる' },
+  { page: 'トップページ', key: 'hero-main',              label: 'ヒーロー メインビジュアル' },
+  { page: 'トップページ', key: 'mission-barrier',        label: 'ミッション①バリアをなくす' },
+  { page: 'トップページ', key: 'mission-support',        label: 'ミッション②ともに支え合う' },
+  { page: 'トップページ', key: 'mission-connect',        label: 'ミッション③つながりを育む' },
+  { page: 'トップページ', key: 'mission-place',          label: 'ミッション④居場所をつくる' },
+  { page: 'トップページ', key: 'home-activities-visual', label: '活動セクション バナー画像' },
+  { page: 'トップページ', key: 'home-support-visual',    label: '支援CTA 背景画像' },
   /* 活動内容 */
   { page: '活動内容',     key: 'activity-01-visual',  label: '月1まぜこぜむら 写真' },
   { page: '活動内容',     key: 'activity-02-visual',  label: 'まぜこぜカフェ 写真' },
@@ -80,17 +82,55 @@ function buildCard(slot) {
       </div>
       <div class="img-slot-footer">
         <div class="img-slot-label">${slot.label}</div>
-        <div style="display:flex;gap:6px;margin-top:8px;">
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
           <button class="btn btn-sm btn-primary" onclick="document.getElementById('input-${slot.key}').click()">
             ${url ? '変更' : 'アップロード'}
           </button>
+          <button class="btn btn-sm btn-secondary" onclick="toggleUrlInput('${slot.key}')">URL指定</button>
           ${url ? `<button class="btn btn-sm btn-delete" onclick="removeImage('${slot.key}')">削除</button>` : ''}
+        </div>
+        <!-- URL先込め入力欄 -->
+        <div id="url-input-wrap-${slot.key}" style="display:none;margin-top:10px;">
+          <div style="display:flex;gap:6px;">
+            <input type="url" id="url-input-${slot.key}"
+              placeholder="https://example.com/image.jpg"
+              style="flex:1;padding:6px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;"
+            >
+            <button class="btn btn-sm btn-primary" onclick="handleUrlSet('${slot.key}')">設定</button>
+          </div>
         </div>
         <div class="img-slot-progress" id="progress-${slot.key}"></div>
       </div>
       <input type="file" id="input-${slot.key}" accept="image/*" style="display:none;">
     </div>`;
 }
+
+window.toggleUrlInput = (key) => {
+  const wrap = document.getElementById(`url-input-wrap-${key}`);
+  const isHidden = wrap.style.display === 'none';
+  wrap.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) document.getElementById(`url-input-${key}`).focus();
+};
+
+window.handleUrlSet = async (key) => {
+  const input = document.getElementById(`url-input-${key}`);
+  const url = input.value.trim();
+  if (!url || !url.startsWith('http')) {
+    showToast('正しいURLを入力してください', 'error');
+    return;
+  }
+  const progressEl = document.getElementById(`progress-${key}`);
+  progressEl.textContent = '保存中…';
+  try {
+    await setDoc(doc(db, 'site-images', key), { url, updatedAt: serverTimestamp() });
+    imageData[key] = url;
+    showToast(`「${SLOTS.find(s=>s.key===key)?.label}」のURLを設定しました`);
+    renderSlots();
+  } catch(e) {
+    progressEl.textContent = '';
+    showToast('保存に失敗しました', 'error');
+  }
+};
 
 async function handleUpload(key, file) {
   if (!file || !file.type.startsWith('image/')) {

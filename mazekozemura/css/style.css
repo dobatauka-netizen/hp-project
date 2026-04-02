@@ -94,12 +94,6 @@ a:hover { opacity: 0.75; text-decoration: underline; }
 
 /* ── ロゴ画像 ──────────────────────────────── */
 .logo-img { height: 48px; width: auto; display: block; }
-.hero-illust {
-  width: min(320px, 80%);
-  margin: 0 auto 24px;
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-}
 
 /* ── ヘッダー ──────────────────────────────── */
 .site-header {
@@ -175,12 +169,116 @@ a:hover { opacity: 0.75; text-decoration: underline; }
 .wave-top  svg { display: block; }
 .wave-bottom svg { display: block; }
 
+/* ── ヒーロービジュアルバナー ─────────────── */
+.hero-visual {
+  width: 100%;
+  aspect-ratio: 21/9;
+  background: linear-gradient(135deg, var(--orange-light) 0%, var(--beige) 50%, var(--green-light) 100%);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+.hero-visual-fallback { display: flex; gap: 24px; font-size: 56px; }
+.hero-visual.has-image .hero-visual-fallback { display: none; }
+.hero-visual.has-image::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.15));
+  pointer-events: none;
+}
+
+/* カードカバー（ミッション/ビジョン/支援カード上部） */
+.card-cover {
+  height: 180px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.card-cover .img-cover-fallback { font-size: 40px; transition: opacity 0.3s; }
+.card-cover.has-image .img-cover-fallback { opacity: 0; }
+
+/* 活動ページのビジュアルボックス */
+.activity-visual {
+  border-radius: var(--radius);
+  aspect-ratio: 4/3;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+}
+.activity-visual .img-cover-fallback { font-size: 64px; margin-bottom: 16px; }
+.activity-visual .activity-badge {
+  position: absolute; bottom: 14px;
+  left: 50%; transform: translateX(-50%);
+  font-size: 13px; font-weight: 700;
+  padding: 6px 18px; border-radius: 20px;
+  white-space: nowrap;
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 1;
+}
+.activity-visual.has-image .img-cover-fallback { display: none; }
+.activity-visual.has-image::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+/* 代表者写真 */
+.rep-photo-wrap {
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--orange-light);
+  border: 4px solid var(--beige-dark);
+  background-size: cover;
+  background-position: center;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 64px;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+}
+.rep-photo-wrap.has-image { font-size: 0; }
+
+/* ストーリーイメージ */
+.story-img-wrap {
+  width: 100%; max-width: 720px;
+  aspect-ratio: 16/9;
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--beige), var(--orange-light));
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 28px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 56px;
+}
+.story-img-wrap.has-image { font-size: 0; }
+
 /* ── ヒーロー ──────────────────────────────── */
 .hero {
   background: var(--cream);
-  padding: 80px 24px 40px;
-  text-align: center;
   position: relative; overflow: hidden;
+}
+.hero-inner {
+  padding: 56px 24px 40px;
+  text-align: center;
+  position: relative; z-index: 1;
 }
 /* 有機的なブロブ背景 */
 .hero::before {
@@ -260,15 +358,44 @@ section { padding: 88px 0; }
 .mission-card {
   background: var(--white);
   border-radius: var(--radius);
-  padding: 36px 28px;
+  overflow: hidden;
   box-shadow: var(--shadow);
   border-top: 5px solid var(--orange);
   transition: transform 0.25s, box-shadow 0.25s;
+  display: flex; flex-direction: column;
 }
 .mission-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); }
-.mission-card .card-icon { font-size: 40px; margin-bottom: 18px; }
-.mission-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 12px; color: var(--orange-dark); }
+.mission-card .card-cover { border-radius: 0; }
+.mission-card-body { padding: 28px 28px 32px; }
+.mission-card .card-icon { font-size: 36px; margin-bottom: 14px; }
+.mission-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 10px; color: var(--orange-dark); }
 .mission-card p  { font-size: 14px; color: var(--text-sub); line-height: 1.9; }
+
+/* ── 活動ビジュアルバンド ───────────────────── */
+.activities-visual-band {
+  width: 100%;
+  aspect-ratio: 16/5;
+  background: linear-gradient(135deg, var(--green-light) 0%, var(--beige) 100%);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 0;
+}
+.activities-visual-fallback {
+  display: flex; gap: 28px; font-size: 52px;
+  opacity: 0.5;
+}
+.activities-visual-band.has-image .activities-visual-fallback { display: none; }
+.activities-visual-band.has-image::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.25) 100%);
+  pointer-events: none;
+}
 
 /* ── 活動カード ────────────────────────────── */
 .activities-grid {
@@ -331,11 +458,21 @@ section { padding: 88px 0; }
 /* ── 支援CTA ────────────────────────────────── */
 .support-box {
   background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+  background-size: cover;
+  background-position: center;
   border-radius: var(--radius);
   padding: 64px 48px;
   text-align: center; color: var(--white);
   position: relative; overflow: hidden;
 }
+.support-box.has-image::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(217,107,34,0.75), rgba(168,78,18,0.80));
+  pointer-events: none;
+  z-index: 0;
+}
+.support-box.has-image > * { position: relative; z-index: 1; }
 .support-box::before {
   content: "";
   position: absolute; top: -40px; right: -40px;
@@ -445,11 +582,14 @@ section { padding: 88px 0; }
   .site-nav { display: none; }
   .nav-toggle { display: flex; }
   .footer-inner { grid-template-columns: 1fr; gap: 36px; }
-  .hero { padding: 56px 20px 36px; }
+  .hero-inner { padding: 40px 20px 36px; }
+  .hero-visual { aspect-ratio: 4/3; }
   section { padding: 60px 0; }
   .support-box { padding: 44px 24px; }
   #float-cta { display: block; }
   .mission-grid { gap: 20px; }
   .activities-grid { gap: 20px; }
   .news-list li { flex-wrap: wrap; gap: 10px; }
+  .card-cover { height: 140px; }
+  .activity-visual { aspect-ratio: 3/2; }
 }
