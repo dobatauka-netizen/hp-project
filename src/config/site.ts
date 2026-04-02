@@ -116,11 +116,3 @@ export const ABOUT_PAGE = {
     { label: '事業内容', value: 'サービス01、サービス02' },
   ],
 } as const;
-
-// カラー設定（CSS変数として global.css に反映されます）
-export const COLORS = {
-  primary: '#2563eb',   // メインカラー（青）
-  accent: '#f59e0b',    // アクセントカラー（黄）
-  dark: '#111827',      // 濃色テキスト
-  light: '#f9fafb',     // 背景色
-} as const;

@@ -1,0 +1,20 @@
+---
+import CTAButton from './CTAButton.astro';
+
+interface Props {
+  title: string;
+  subtitle: string;
+  label: string;
+  href?: string;
+}
+
+const { title, subtitle, label, href = '/contact' } = Astro.props;
+---
+
+<section class="py-20 px-4 bg-blue-600 text-white text-center">
+  <div class="max-w-2xl mx-auto">
+    <h2 class="text-3xl font-bold mb-4">{title}</h2>
+    <p class="text-blue-100 mb-8">{subtitle}</p>
+    <CTAButton label={label} href={href} variant="secondary" />
+  </div>
+</section>

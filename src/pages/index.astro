@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import CTAButton from '../components/CTAButton.astro';
+import CTASection from '../components/CTASection.astro';
 import { SITE, HOME_PAGE } from '../config/site';
 
 const { hero, features, reasons, cta } = HOME_PAGE;
@@ -54,13 +55,10 @@ const { hero, features, reasons, cta } = HOME_PAGE;
     </div>
   </section>
 
-  <!-- CTA -->
-  <section class="py-20 px-4 bg-blue-600 text-white text-center">
-    <div class="max-w-2xl mx-auto">
-      <h2 class="text-3xl font-bold mb-4">{cta.title}</h2>
-      <p class="text-blue-100 mb-8">{cta.subtitle}</p>
-      <CTAButton label={cta.label} href="/contact" variant="secondary" />
-    </div>
-  </section>
+  <CTASection
+    title={cta.title}
+    subtitle={cta.subtitle}
+    label={cta.label}
+  />
 
 </BaseLayout>
