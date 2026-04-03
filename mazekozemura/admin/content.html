@@ -3,23 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ページ画像管理｜まぜこぜむら 管理画面</title>
+  <title>テキスト編集｜まぜこぜむら 管理画面</title>
   <link rel="stylesheet" href="css/admin.css">
   <style>
-    .img-slot-card {
-      border: 1px solid var(--border); border-radius: 12px;
-      overflow: hidden; background: var(--white);
+    .content-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--white);
       box-shadow: var(--shadow);
+      padding: 20px 24px;
+      margin-bottom: 16px;
     }
-    .img-slot-preview {
-      height: 160px;
-      background: #F1F5F9 center/cover no-repeat;
-      display: flex; align-items: center; justify-content: center;
+    .content-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .img-slot-empty { text-align: center; color: var(--text-sub); font-size: 13px; }
-    .img-slot-footer { padding: 14px 16px; }
-    .img-slot-label { font-size: 13px; font-weight: 700; color: var(--text); }
-    .img-slot-progress { font-size: 12px; color: var(--accent); margin-top: 6px; min-height: 16px; }
+    .content-label .updated-at {
+      font-size: 11px;
+      color: #94A3B8;
+      font-weight: 400;
+    }
+    .content-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      line-height: 1.7;
+      resize: vertical;
+      min-height: 72px;
+      color: var(--text);
+      background: #F8FAFC;
+      transition: border-color 0.2s;
+    }
+    .content-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: #fff;
+    }
+    .content-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      align-items: center;
+    }
+    .content-status {
+      font-size: 12px;
+      color: #64748B;
+    }
   </style>
 </head>
 <body>
@@ -43,10 +80,10 @@
       <a href="news.html" class="nav-link">
         <span class="nav-icon">📰</span> お知らせ管理
       </a>
-      <a href="pages.html" class="nav-link active">
+      <a href="pages.html" class="nav-link">
         <span class="nav-icon">🖼️</span> ページ画像管理
       </a>
-      <a href="content.html" class="nav-link">
+      <a href="content.html" class="nav-link active">
         <span class="nav-icon">✏️</span> テキスト編集
       </a>
       <div class="nav-section">設定</div>
@@ -67,11 +104,11 @@
   <!-- メインエリア -->
   <main class="admin-main">
     <div class="topbar">
-      <span class="topbar-title">ページ画像管理</span>
-      <span style="font-size:13px;color:#64748B;">画像をアップロードするとサイトに即時反映されます</span>
+      <span class="topbar-title">テキスト編集</span>
+      <span style="font-size:13px;color:#64748B;">保存するとサイトに即時反映されます</span>
     </div>
     <div class="admin-content">
-      <div id="slots-container">
+      <div id="content-container">
         <p style="color:#64748B;">読み込み中…</p>
       </div>
     </div>
@@ -79,19 +116,6 @@
 </div>
 
 <div id="toast-container"></div>
-<script>
-  // 診断：モジュール読み込み前に実行
-  window.addEventListener('error', function(e) {
-    document.getElementById('slots-container').innerHTML =
-      '<div style="color:#DC2626;padding:16px;background:#FEF2F2;border-radius:8px;font-size:13px;">'
-      + '❌ JSエラー: ' + e.message + '<br>場所: ' + e.filename + ':' + e.lineno + '</div>';
-  });
-  window.addEventListener('unhandledrejection', function(e) {
-    document.getElementById('slots-container').innerHTML =
-      '<div style="color:#DC2626;padding:16px;background:#FEF2F2;border-radius:8px;font-size:13px;">'
-      + '❌ 非同期エラー: ' + (e.reason?.message || e.reason) + '</div>';
-  });
-</script>
-<script type="module" src="js/pages.js?v=2"></script>
+<script type="module" src="js/content.js"></script>
 </body>
 </html>
