@@ -35,6 +35,7 @@ async function applySiteImages() {
           el.style.backgroundImage  = `url('${url}')`;
           el.style.backgroundSize   = 'cover';
           el.style.backgroundPosition = 'center';
+          el.classList.add('has-image');
         }
       });
     });

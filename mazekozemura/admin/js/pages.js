@@ -1,11 +1,11 @@
-import { db, storage } from './firebase-config.js';
+import { db } from './firebase-config.js';
 import { requireAuth, logout, showToast } from './auth.js';
 import {
   collection, getDocs, doc, setDoc, deleteField, updateDoc, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-import {
-  ref, uploadBytesResumable, getDownloadURL, deleteObject
-} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
+
+const CLOUDINARY_CLOUD = 'dv2getmk7';
+const CLOUDINARY_PRESET = 'mazekozemura';
 
 /* ─── 画像スロット定義 ─── */
 const SLOTS = [
@@ -42,8 +42,16 @@ let imageData = {}; // { [key]: url }
 
 requireAuth(async () => {
   document.getElementById('logout-btn').addEventListener('click', logout);
-  await loadImages();
-  renderSlots();
+  try {
+    await loadImages();
+    renderSlots();
+  } catch (e) {
+    console.error('[pages.js] エラー:', e);
+    document.getElementById('slots-container').innerHTML =
+      `<div style="color:#DC2626;padding:20px;background:#FEF2F2;border-radius:8px;">
+        <strong>読み込みエラー:</strong> ${e.message || e}
+      </div>`;
+  }
 });
 
 async function loadImages() {
@@ -132,39 +140,57 @@ window.handleUrlSet = async (key) => {
   }
 };
 
+async function compressImage(file, maxPx = 1920, quality = 0.82) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxPx || height > maxPx) {
+        if (width > height) { height = Math.round(height * maxPx / width); width = maxPx; }
+        else                { width  = Math.round(width  * maxPx / height); height = maxPx; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      canvas.toBlob(resolve, 'image/jpeg', quality);
+    };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 async function handleUpload(key, file) {
   if (!file || !file.type.startsWith('image/')) {
     showToast('画像ファイルを選択してください', 'error');
     return;
   }
-  if (file.size > 5 * 1024 * 1024) {
-    showToast('5MB以下の画像を選択してください', 'error');
-    return;
-  }
 
   const progressEl = document.getElementById(`progress-${key}`);
-  const ext        = file.name.split('.').pop();
-  const storageRef = ref(storage, `site-images/${key}.${ext}`);
+  progressEl.textContent = '圧縮中…';
 
-  await new Promise((resolve, reject) => {
-    const task = uploadBytesResumable(storageRef, file);
-    task.on('state_changed',
-      snap => {
-        const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
-        progressEl.textContent = `アップロード中… ${pct}%`;
-      },
-      err => { progressEl.textContent = ''; reject(err); },
-      async () => {
-        progressEl.textContent = '';
-        const url = await getDownloadURL(task.snapshot.ref);
-        await setDoc(doc(db, 'site-images', key), { url, updatedAt: serverTimestamp() });
-        imageData[key] = url;
-        showToast(`「${SLOTS.find(s=>s.key===key)?.label}」を保存しました`);
-        renderSlots();
-        resolve();
-      }
-    );
-  });
+  try {
+    const compressed = await compressImage(file);
+    progressEl.textContent = 'アップロード中…';
+
+    const formData = new FormData();
+    formData.append('file', compressed, 'image.jpg');
+    formData.append('upload_preset', CLOUDINARY_PRESET);
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (!data.secure_url) throw new Error(data.error?.message || 'アップロード失敗');
+
+    await setDoc(doc(db, 'site-images', key), { url: data.secure_url, updatedAt: serverTimestamp() });
+    imageData[key] = data.secure_url;
+    progressEl.textContent = '';
+    showToast(`「${SLOTS.find(s=>s.key===key)?.label}」を保存しました`);
+    renderSlots();
+  } catch (err) {
+    progressEl.textContent = '❌ エラー: ' + (err.message || err);
+    showToast('アップロードに失敗しました: ' + err.message, 'error');
+  }
 }
 
 window.removeImage = async (key) => {

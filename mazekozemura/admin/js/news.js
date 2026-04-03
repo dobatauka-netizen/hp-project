@@ -1,12 +1,12 @@
-import { db, storage } from './firebase-config.js';
+import { db } from './firebase-config.js';
 import { requireAuth, logout, showToast, confirmDialog, formatDate, CATEGORY_LABELS, CATEGORY_CLASSES } from './auth.js';
 import {
   collection, getDocs, addDoc, updateDoc, deleteDoc,
   doc, query, orderBy, Timestamp, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-import {
-  ref, uploadBytesResumable, getDownloadURL, deleteObject
-} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
+
+const CLOUDINARY_CLOUD = 'dv2getmk7';
+const CLOUDINARY_PRESET = 'mazekozemura';
 
 let allDocs    = [];
 let editingId  = null;
@@ -110,10 +110,6 @@ function handleFileSelect(file) {
     showToast('画像ファイルを選択してください', 'error');
     return;
   }
-  if (file.size > 5 * 1024 * 1024) {
-    showToast('5MB以下の画像を選択してください', 'error');
-    return;
-  }
   selectedFile = file;
   const reader = new FileReader();
   reader.onload = (e) => showImagePreview(e.target.result);
@@ -194,28 +190,45 @@ function closeModal() {
   selectedFile = null;
 }
 
+/* ─── 画像圧縮 ─── */
+async function compressImage(file, maxPx = 1920, quality = 0.82) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxPx || height > maxPx) {
+        if (width > height) { height = Math.round(height * maxPx / width); width = maxPx; }
+        else                { width  = Math.round(width  * maxPx / height); height = maxPx; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      canvas.toBlob(resolve, 'image/jpeg', quality);
+    };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 /* ─── 画像アップロード ─── */
 async function uploadImage(file) {
-  const ext      = file.name.split('.').pop();
-  const filename = `news-images/${Date.now()}.${ext}`;
-  const storageRef = ref(storage, filename);
   const progressEl = document.getElementById('upload-progress');
+  progressEl.textContent = '圧縮中…';
 
-  return new Promise((resolve, reject) => {
-    const task = uploadBytesResumable(storageRef, file);
-    task.on('state_changed',
-      (snap) => {
-        const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
-        progressEl.textContent = `アップロード中… ${pct}%`;
-      },
-      (err) => { progressEl.textContent = ''; reject(err); },
-      async () => {
-        progressEl.textContent = '';
-        const url = await getDownloadURL(task.snapshot.ref);
-        resolve(url);
-      }
-    );
+  const compressed = await compressImage(file);
+  progressEl.textContent = 'アップロード中…';
+
+  const formData = new FormData();
+  formData.append('file', compressed, 'image.jpg');
+  formData.append('upload_preset', CLOUDINARY_PRESET);
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+    method: 'POST',
+    body: formData
   });
+  const data = await res.json();
+  progressEl.textContent = '';
+  if (!data.secure_url) throw new Error(data.error?.message || 'アップロード失敗');
+  return data.secure_url;
 }
 
 /* ─── 保存 ─── */
@@ -267,14 +280,6 @@ window.deleteNews = async (id) => {
   const ok = await confirmDialog('記事を削除しますか？', 'この操作は元に戻せません。');
   if (!ok) return;
   try {
-    const item = allDocs.find(d => d.id === id);
-    // Storage の画像も削除
-    if (item?.imageUrl) {
-      try {
-        const imgRef = ref(storage, item.imageUrl);
-        await deleteObject(imgRef);
-      } catch (_) { /* 画像が存在しない場合は無視 */ }
-    }
     await deleteDoc(doc(db, 'news', id));
     showToast('記事を削除しました');
     await loadNews();
