@@ -65,6 +65,29 @@
         </div>
       </div>
 
+      <!-- パスワード変更 -->
+      <div class="admin-card" style="margin-bottom:16px;">
+        <div class="admin-card-header">
+          <h3>🔑 パスワード変更</h3>
+        </div>
+        <div style="padding:20px;max-width:420px;">
+          <div class="form-group">
+            <label>現在のパスワード <span style="color:#EF4444">*</span></label>
+            <input type="password" id="pw-current" placeholder="現在のパスワード" autocomplete="current-password">
+          </div>
+          <div class="form-group">
+            <label>新しいパスワード <span style="color:#EF4444">*</span></label>
+            <input type="password" id="pw-new" placeholder="6文字以上" minlength="6" autocomplete="new-password">
+          </div>
+          <div class="form-group">
+            <label>新しいパスワード（確認） <span style="color:#EF4444">*</span></label>
+            <input type="password" id="pw-confirm" placeholder="もう一度入力" autocomplete="new-password">
+          </div>
+          <span id="pw-error" class="error-msg"></span>
+          <button class="btn btn-primary" id="btn-change-pw">パスワードを変更する</button>
+        </div>
+      </div>
+
       <div class="admin-card">
         <div class="admin-card-header">
           <h3>管理者一覧 <span style="font-size:13px;font-weight:400;color:#64748B;margin-left:8px;"><span id="admin-count">0</span> 名</span></h3>
