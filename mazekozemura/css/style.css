@@ -158,6 +158,11 @@ a:hover { opacity: 0.75; text-decoration: underline; }
   justify-content: center; align-items: center; gap: 16px;
   padding: 40px 24px;
 }
+/* メニューが開いている時、閉じるボタンをオーバーレイの上に表示 */
+.nav-toggle[aria-expanded="true"] {
+  position: relative;
+  z-index: 300;
+}
 #nav-menu.is-open a {
   font-size: 20px; padding: 16px 40px;
   border-radius: 32px; min-height: 56px;

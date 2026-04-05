@@ -21,8 +21,8 @@ requireAuth(async () => {
 
 /* ─── 一覧読み込み ─── */
 async function loadNews() {
-  const tbody = document.getElementById('news-tbody');
-  tbody.innerHTML = '<tr class="loading-row"><td colspan="5">読み込み中…</td></tr>';
+  const grid = document.getElementById('news-grid');
+  grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><p>読み込み中…</p></div>';
 
   const q = query(collection(db, 'news'), orderBy('date', 'desc'));
   const snap = await getDocs(q);
@@ -31,37 +31,41 @@ async function loadNews() {
 }
 
 function renderTable(docs) {
-  const tbody = document.getElementById('news-tbody');
+  const grid  = document.getElementById('news-grid');
   const count = document.getElementById('news-count');
   count.textContent = docs.length;
 
   if (docs.length === 0) {
-    tbody.innerHTML = `
-      <tr><td colspan="5">
-        <div class="empty-state">
-          <div class="empty-icon">📭</div>
-          <p>記事がまだありません。「新規作成」から追加してください。</p>
-        </div>
-      </td></tr>`;
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <p>記事がまだありません。<br>「＋ 新しい記事を作成」ボタンから追加してください。</p>
+      </div>`;
     return;
   }
 
-  tbody.innerHTML = docs.map(d => `
-    <tr data-id="${d.id}">
-      <td style="white-space:nowrap">${formatDate(d.date)}</td>
-      <td><span class="badge ${CATEGORY_CLASSES[d.category] || ''}">${CATEGORY_LABELS[d.category] || d.category}</span></td>
-      <td style="max-width:300px">
-        ${d.imageUrl ? `<img src="${d.imageUrl}" style="height:36px;width:52px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:8px;">` : ''}
-        ${escHtml(d.title)}
-      </td>
-      <td><span class="badge ${d.published ? 'badge-pub' : 'badge-draft'}">${d.published ? '公開中' : '下書き'}</span></td>
-      <td>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-sm btn-edit" onclick="editNews('${d.id}')">編集</button>
-          <button class="btn btn-sm btn-delete" onclick="deleteNews('${d.id}')">削除</button>
+  const CAT_ICON = { event: '🎪', report: '📝', info: '📢' };
+
+  grid.innerHTML = docs.map(d => `
+    <div class="news-card" data-id="${d.id}">
+      ${d.imageUrl
+        ? `<img class="news-card-img" src="${d.imageUrl}" alt="${escHtml(d.title)}">`
+        : `<div class="news-card-no-img">${CAT_ICON[d.category] || '📰'}</div>`
+      }
+      <div class="news-card-body">
+        <div class="news-card-meta">
+          <span class="badge ${CATEGORY_CLASSES[d.category] || ''}">${CAT_ICON[d.category] || ''} ${CATEGORY_LABELS[d.category] || d.category}</span>
+          <span class="badge ${d.published ? 'badge-pub' : 'badge-draft'}">${d.published ? '✅ 公開中' : '📝 下書き'}</span>
+          <span class="news-card-date">📅 ${formatDate(d.date)}</span>
         </div>
-      </td>
-    </tr>`).join('');
+        <div class="news-card-title">${escHtml(d.title)}</div>
+        ${d.body ? `<div class="news-card-body-text">${escHtml(d.body)}</div>` : ''}
+      </div>
+      <div class="news-card-footer">
+        <button class="btn btn-sm btn-edit" onclick="editNews('${d.id}')">✏️ 編集</button>
+        <button class="btn btn-sm btn-delete" onclick="deleteNews('${d.id}')">🗑️ 削除</button>
+      </div>
+    </div>`).join('');
 }
 
 /* ─── イベントバインド ─── */
@@ -69,6 +73,12 @@ function bindEvents() {
   document.getElementById('btn-new').addEventListener('click', () => openModal(null));
   document.getElementById('modal-close').addEventListener('click', closeModal);
   document.getElementById('btn-cancel').addEventListener('click', closeModal);
+
+  // 公開ラベルをリアルタイム更新
+  document.getElementById('f-published').addEventListener('change', (e) => {
+    document.getElementById('publish-label-text').textContent =
+      e.target.checked ? '公開する' : '下書きとして保存する';
+  });
   document.getElementById('modal-overlay').addEventListener('click', (e) => {
     if (e.target === e.currentTarget) closeModal();
   });

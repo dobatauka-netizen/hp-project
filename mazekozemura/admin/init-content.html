@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>コンテンツ初期化｜まぜこぜむら</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div style="max-width:720px;margin:60px auto;padding:0 24px;">
+  <h2 style="font-size:22px;font-weight:800;margin-bottom:8px;">🔧 テキストコンテンツ初期化</h2>
+  <p style="color:#64748B;margin-bottom:24px;">HTMLに書かれているデフォルトテキストをFirestoreに一括保存します。<br>一度だけ実行してください。</p>
+  <button id="btn-run" style="background:#D96B22;color:#fff;border:none;border-radius:10px;padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;">
+    ▶ 初期データを保存する
+  </button>
+  <div id="log" style="margin-top:24px;font-size:14px;line-height:2;"></div>
+</div>
+<script type="module">
+  import { db } from './js/firebase-config.js';
+  import { doc, setDoc, serverTimestamp, getDoc }
+    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  const DEFAULTS = [
+    { key: 'home-hero-sub',         text: '障がい者・健常者・高齢者・マイノリティ・子どもたち。\nちがいを超えて、ともに笑い、ともに育つコミュニティをつくります。' },
+    { key: 'home-mission-desc',     text: '社会にいつの間にか生まれてしまったバリアをなくし、\nだれもが自分らしく生きられる場所をつくります。' },
+    { key: 'about-vision-text',     text: '社会においていつの間にか作られてしまったバリアをなくし、障がい者、健常者、高齢者、マイノリティ、子どもたちが「まぜこぜ」で共存共栄できる社会を創ることを目的としています。わたしたちは、「まぜこぜが当たり前の世の中」になる日を目指して、地域に根ざした活動を続けています。' },
+    { key: 'about-mission-text',    text: '障がいの有無、年齢、国籍、あらゆる違いによって生まれる見えないバリアをなくし、すべての人が自分らしく参加できる地域コミュニティをつくります。' },
+    { key: 'about-vision-card-text',text: '障がいのある人もない人も、お年寄りも子どもも、ともに笑い合える「まぜこぜむら」を実現します。やがて「まぜこぜが当たり前」の社会になる日まで、活動を続けます。' },
+    { key: 'about-value-text',      text: '多様性の尊重・継続的なつながり・地域に根ざした活動・誰も排除しない包摂性。ユニバーサルデザインの精神で、すべての人が「ここにいていい」と感じられる場をつくります。' },
+    { key: 'about-address',         text: '〒812-0036　福岡市博多区古門戸町7-8　大串公認会計士・税理士事務所 201号室' },
+    { key: 'about-tel',             text: '092-263-8060' },
+    { key: 'about-story-1',         text: 'まぜこぜむらは、「障がい者も健常者もお年寄りも子どもも、まぜこぜで共存共栄しよう」という想いのもとに生まれました。地域の中で「なんとなく分断されている」と感じる場面を目の当たりにするたびに、「だれもが一緒に過ごせる場所を作りたい」という思いが強くなっていきました。' },
+    { key: 'about-story-2',         text: 'はじめは任意団体として活動をスタートし、毎月の集まりやイベントを重ねながら、少しずつ仲間の輪を広げてきました。「社会にとって必要な存在となるべく」、2021年（令和3年）6月に一般社団法人として法人化。活動をより多くの人に届けられるよう、組織としての体制を整えました。' },
+    { key: 'about-story-3',         text: '将来は常設のユニバーサルデザインカフェの設立を目指しています。「おにぎり」のようにいろんな具が一緒に包まれた、だれもが気軽に立ち寄れる場所。いつか「まぜこぜが当たり前」の世の中になり、わたしたちが不要な存在となる日まで、活動を続けていきます。' },
+    { key: 'act-01-body',           text: '月に1度、さまざまな背景を持つ人たちが一堂に集まる憩いの場です。\n特別なプログラムはなく、ただ「ここにいる」ことができる時間。' },
+    { key: 'act-02-body',           text: 'お茶やコーヒーを飲みながら、隣り合った人とゆっくり話す2時間。\nテーブルを囲んでいれば、自然と会話が生まれます。' },
+    { key: 'act-03-body',           text: 'みんなで畑を耕し、種をまき、野菜を育てます。\n土に触れ、自然の中で体を動かすことで、言葉がなくても通じ合えるものがあります。' },
+    { key: 'act-04-body',           text: '地域のデイサービス施設を訪問し、利用者のみなさんと交流・慰問を行います。\n歌や体操、おしゃべりなど、その日の雰囲気に合わせた時間を過ごします。' },
+    { key: 'act-05-body',           text: '誰もが気軽に立ち寄れる、常設のカフェスペースを地域に設けることを計画しています。\n「おにぎり」のように、いろんな具が一緒に包まれた、ユニバーサルな空間。' },
+  ];
+
+  const logEl = document.getElementById('log');
+  const btn   = document.getElementById('btn-run');
+
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    btn.textContent = '保存中…';
+    logEl.innerHTML = '';
+
+    let ok = 0, skip = 0, fail = 0;
+    for (const item of DEFAULTS) {
+      try {
+        // すでにデータがある場合はスキップ
+        const existing = await getDoc(doc(db, 'site-content', item.key));
+        if (existing.exists() && existing.data().text) {
+          logEl.innerHTML += `<div>⏭️ スキップ（既存）: ${item.key}</div>`;
+          skip++;
+          continue;
+        }
+        await setDoc(doc(db, 'site-content', item.key), {
+          text: item.text,
+          updatedAt: serverTimestamp()
+        });
+        logEl.innerHTML += `<div style="color:#16A34A;">✅ 保存: ${item.key}</div>`;
+        ok++;
+      } catch(e) {
+        logEl.innerHTML += `<div style="color:#DC2626;">❌ 失敗: ${item.key} — ${e.message}</div>`;
+        fail++;
+      }
+    }
+
+    logEl.innerHTML += `<div style="margin-top:16px;font-weight:700;">
+      完了: ✅${ok}件保存 / ⏭️${skip}件スキップ / ❌${fail}件失敗
+    </div>`;
+    btn.textContent = '完了';
+    if (fail === 0) {
+      logEl.innerHTML += `<div style="margin-top:8px;color:#16A34A;font-weight:700;">
+        🎉 テキスト編集画面で「✅ 保存済み」バッジが表示されるようになりました！
+      </div>`;
+    }
+  });
+</script>
+</body>
+</html>

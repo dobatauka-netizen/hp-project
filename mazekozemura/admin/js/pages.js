@@ -40,16 +40,31 @@ const SLOTS = [
 
 let imageData = {}; // { [key]: url }
 
-requireAuth(async () => {
+requireAuth(async (user) => {
+  const diag = (msg) => {
+    console.log('[pages.js]', msg);
+    document.getElementById('slots-container').innerHTML =
+      `<p style="color:#64748B;padding:20px;">⏳ ${msg}</p>`;
+  };
+
+  diag('認証OK（' + (user?.email || '') + '）。Firestore接続中…');
   document.getElementById('logout-btn').addEventListener('click', logout);
+
   try {
-    await loadImages();
+    // 10秒タイムアウト付きで loadImages を実行
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Firestore接続タイムアウト（10秒）')), 10000)
+    );
+    await Promise.race([loadImages(), timeout]);
+
+    diag('画像データ取得完了。画面を描画中…');
     renderSlots();
   } catch (e) {
     console.error('[pages.js] エラー:', e);
     document.getElementById('slots-container').innerHTML =
       `<div style="color:#DC2626;padding:20px;background:#FEF2F2;border-radius:8px;">
-        <strong>読み込みエラー:</strong> ${e.message || e}
+        <strong>❌ エラー:</strong> ${e.message || e}<br>
+        <small style="color:#64748B;">→ Firebaseコンソールでルールやプロジェクト設定を確認してください</small>
       </div>`;
   }
 });

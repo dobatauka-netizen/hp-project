@@ -94,7 +94,7 @@
 
       <!-- 右：フォーム -->
       <div>
-        <form class="contact-form" action="#" method="post">
+        <form class="contact-form" id="contact-form">
           <div class="form-group">
             <label>お名前<span class="required">必須</span></label>
             <input type="text" name="name" placeholder="山田 太郎" required>
@@ -156,14 +156,57 @@
     </div>
     <div class="footer-bottom">
       <p>&copy; 2026 一般社団法人まぜこぜむら. All Rights Reserved.</p>
-      <div class="sns-links">
+      <div style="display:flex;gap:16px;align-items:center;">
+        <a href="privacy.html" style="font-size:12px;color:#94A3B8;">プライバシーポリシー</a>
         <a href="https://www.instagram.com/mazekozemura/" target="_blank" rel="noopener" title="Instagram">📷</a>
       </div>
     </div>
   </div>
 </footer>
 
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, addDoc, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
+const firebaseConfig = {
+  apiKey: "AIzaSyA6Z_h9yY_BhG3QwHBPt7EZYJAFiQbiNb8",
+  authDomain: "mazekozemura-web.firebaseapp.com",
+  projectId: "mazekozemura-web",
+  storageBucket: "mazekozemura-web.firebasestorage.app",
+  messagingSenderId: "82198995339",
+  appId: "1:82198995339:web:b9d4eb16a78a6fc3678f8e"
+};
+const app = initializeApp(firebaseConfig, 'contact-form');
+const db  = getFirestore(app);
+
+document.getElementById('contact-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('[type="submit"]');
+  btn.disabled = true;
+  btn.textContent = '送信中…';
+
+  try {
+    await addDoc(collection(db, 'contacts'), {
+      name:     e.target.name.value.trim(),
+      email:    e.target.email.value.trim(),
+      category: e.target.category.value,
+      message:  e.target.message.value.trim(),
+      createdAt: serverTimestamp()
+    });
+    e.target.innerHTML = `
+      <div style="text-align:center;padding:48px 20px;">
+        <div style="font-size:52px;margin-bottom:16px;">✅</div>
+        <h3 style="font-size:20px;font-weight:800;color:#16A34A;margin-bottom:8px;">送信が完了しました</h3>
+        <p style="color:#64748B;line-height:1.8;">お問い合わせありがとうございます。<br>3営業日以内にご返信いたします。</p>
+      </div>`;
+  } catch(err) {
+    btn.disabled = false;
+    btn.textContent = '送信する';
+    alert('送信に失敗しました。しばらく時間をおいて再度お試しください。\n' + err.message);
+  }
+});
+</script>
 <script src="js/main.js"></script>
 <script type="module" src="js/site-images.js"></script>
 </body>
