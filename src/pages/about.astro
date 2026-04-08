@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import CTAButton from '../components/CTAButton.astro';
+import PageHeader from '../components/PageHeader.astro';
+import CTASection from '../components/CTASection.astro';
 import { SITE, ABOUT_PAGE } from '../config/site';
 
 const { mission, message, companyInfo } = ABOUT_PAGE;
@@ -8,13 +9,7 @@ const { mission, message, companyInfo } = ABOUT_PAGE;
 
 <BaseLayout title={`会社概要 | ${SITE.name}`} description={`${SITE.name}の会社概要・理念をご紹介します。`}>
 
-  <!-- ページヘッダー -->
-  <section class="bg-gray-900 text-white py-20 px-4">
-    <div class="max-w-4xl mx-auto text-center">
-      <h1 class="text-4xl font-bold mb-4">会社概要</h1>
-      <p class="text-gray-400 text-lg">私たちについてご紹介します。</p>
-    </div>
-  </section>
+  <PageHeader title="会社概要" subtitle="私たちについてご紹介します。" />
 
   <!-- ミッション -->
   <section class="py-20 px-4 bg-white">
@@ -57,13 +52,10 @@ const { mission, message, companyInfo } = ABOUT_PAGE;
     </div>
   </section>
 
-  <!-- CTA -->
-  <section class="py-20 px-4 bg-blue-600 text-white text-center">
-    <div class="max-w-2xl mx-auto">
-      <h2 class="text-3xl font-bold mb-4">ご相談・お問い合わせ</h2>
-      <p class="text-blue-100 mb-8">採用・事業提携のご相談もお気軽にどうぞ。</p>
-      <CTAButton label="お問い合わせ" href="/contact" variant="secondary" />
-    </div>
-  </section>
+  <CTASection
+    title="ご相談・お問い合わせ"
+    subtitle="採用・事業提携のご相談もお気軽にどうぞ。"
+    label="お問い合わせ"
+  />
 
 </BaseLayout>

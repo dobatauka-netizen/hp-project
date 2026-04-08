@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { SITE, PRIVACY_PAGE } from '../config/site';
+---
+
+<BaseLayout title={`プライバシーポリシー | ${SITE.name}`} description={`${SITE.name}のプライバシーポリシーです。`}>
+
+  <PageHeader title="プライバシーポリシー" subtitle="個人情報の取り扱いについて" />
+
+  <section class="py-20 px-4 bg-white">
+    <div class="max-w-3xl mx-auto">
+      <p class="text-sm text-gray-500 mb-10">最終更新日: {PRIVACY_PAGE.lastUpdated}</p>
+
+      <div class="space-y-10">
+        {PRIVACY_PAGE.sections.map((section, i) => (
+          <div>
+            <h2 class="text-xl font-bold text-gray-900 mb-3">
+              {i + 1}. {section.title}
+            </h2>
+            <p class="text-gray-600 leading-relaxed">{section.content}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
